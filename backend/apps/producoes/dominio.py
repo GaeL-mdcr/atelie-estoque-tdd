@@ -9,11 +9,15 @@ from datetime import datetime
 from decimal import Decimal
 
 from apps.cadastros.dominio import Categoria, CategoriaIncompativelError
-from apps.comum.erros import ValorObrigatorioError
+from apps.comum.erros import ErroDeNegocio, ValorObrigatorioError
 from apps.comum.numeros import dinheiro, quantidade, texto_obrigatorio
 
 USO = "U"
 RETORNO = "R"
+
+
+class RetornoExcedeUsoError(ErroDeNegocio):
+    """Tentou devolver mais do que ainda pode voltar daquele uso."""
 
 
 @dataclass(frozen=True)
@@ -58,6 +62,10 @@ class Producao:
     def registrar_retorno(self, id_uso_origem, estoque, qtd, quando):
         uso = next(m for m in self._movimentacoes if m.id == id_uso_origem)
         qtd = quantidade(qtd)
+        devolvivel = self.quantidade_devolvivel(uso.id)
+        if qtd > devolvivel:
+            texto = format(devolvivel.normalize(), "f").replace(".", ",")
+            raise RetornoExcedeUsoError(f"Desse uso ainda podem voltar no máximo {texto}.")
         estoque.registrar_retorno(qtd, uso.custo_unitario)
         retorno = MovimentacaoMaterial(RETORNO, uso.variante_id, qtd, uso.custo_unitario, quando, uso.id)
         self._movimentacoes.append(retorno)
