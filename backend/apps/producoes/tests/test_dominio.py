@@ -13,6 +13,7 @@ from apps.comum.erros import ValorObrigatorioError
 from apps.estoque.dominio import EstoqueVariante, SaldoInsuficienteError
 from apps.producoes.dominio import (
     Producao,
+    ProducaoConcluidaError,
     RetornoExcedeUsoError,
     UsoNaoEncontradoError,
     VarianteDiferenteError,
@@ -150,3 +151,16 @@ def deve_calcular_os_custos_da_saia_midi(saia, azul):
 def deve_ter_custo_so_de_mao_de_obra_sem_movimentacoes(saia):
     assert saia.custo_materiais() == Decimal("0.00")
     assert saia.custo_total() == Decimal("60.00")
+
+
+# Peça pronta não recebe nem devolve material (RN-T15).
+def deve_bloquear_uso_e_retorno_depois_de_concluir(saia, azul):
+    uso = saia.registrar_uso(azul, "3", T1)
+    saia.concluir(CONCLUSAO)
+    assert saia.concluida is True
+    assert saia.dt_finalizacao == CONCLUSAO
+    with pytest.raises(ProducaoConcluidaError):
+        saia.registrar_uso(azul, "1", T2)
+    with pytest.raises(ProducaoConcluidaError):
+        saia.registrar_retorno(uso.id, azul, "1", T2)
+    assert azul.saldo == Decimal("47.000")
