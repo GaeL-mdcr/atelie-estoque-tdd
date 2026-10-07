@@ -5,7 +5,7 @@ Cada cor tem o seu: mexer no Azul não muda o Branco do mesmo tecido.
 """
 
 from apps.comum.erros import ErroDeNegocio
-from apps.comum.numeros import decimal_de, dinheiro, quantidade
+from apps.comum.numeros import dinheiro, exigir_nao_negativo, exigir_positivo, quantidade
 
 
 class SaldoInsuficienteError(ErroDeNegocio):
@@ -19,9 +19,9 @@ class SaldoInsuficienteError(ErroDeNegocio):
 
 class EstoqueVariante:
     def __init__(self, qtd_inicial="0", vl_unitario_inicial="0", qtd_estoque_minimo="0"):
-        self._saldo = quantidade(qtd_inicial)
-        self._custo_medio = dinheiro(vl_unitario_inicial)
-        self._qtd_estoque_minimo = quantidade(qtd_estoque_minimo)
+        self._saldo = quantidade(exigir_nao_negativo(qtd_inicial, "quantidade inicial"))
+        self._custo_medio = dinheiro(exigir_nao_negativo(vl_unitario_inicial, "valor unitário inicial"))
+        self._qtd_estoque_minimo = quantidade(exigir_nao_negativo(qtd_estoque_minimo, "estoque mínimo"))
 
     @property
     def saldo(self):
@@ -35,18 +35,19 @@ class EstoqueVariante:
         return self._saldo < self._qtd_estoque_minimo
 
     def registrar_entrada(self, qtd, custo_total):
-        self._somar_com_media_ponderada(quantidade(qtd), decimal_de(custo_total))
+        qtd = quantidade(exigir_positivo(qtd, "quantidade"))
+        self._somar_com_media_ponderada(qtd, exigir_nao_negativo(custo_total, "custo da compra"))
 
     def registrar_saida(self, qtd):
-        qtd = quantidade(qtd)
+        qtd = quantidade(exigir_positivo(qtd, "quantidade"))
         if qtd > self._saldo:
             raise SaldoInsuficienteError(self._saldo)
         self._saldo = quantidade(self._saldo - qtd)
         return self._custo_medio
 
     def registrar_retorno(self, qtd, custo_unitario):
-        qtd = quantidade(qtd)
-        self._somar_com_media_ponderada(qtd, qtd * decimal_de(custo_unitario))
+        qtd = quantidade(exigir_positivo(qtd, "quantidade"))
+        self._somar_com_media_ponderada(qtd, qtd * exigir_nao_negativo(custo_unitario, "custo do uso"))
 
     def _somar_com_media_ponderada(self, qtd, valor_que_entra):
         # (saldo × média + o que entra) ÷ (saldo + qtd). O saldo novo nunca é zero
