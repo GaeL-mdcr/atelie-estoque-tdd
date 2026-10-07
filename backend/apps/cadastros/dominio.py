@@ -4,6 +4,7 @@ Cadastros do ateliê: cor, categoria e material.
 
 import re
 
+from apps.comum.arquivavel import Arquivavel
 from apps.comum.erros import ErroDeNegocio, ValorInvalidoError
 from apps.comum.numeros import texto_obrigatorio
 
@@ -14,8 +15,9 @@ class CorInvalidaError(ErroDeNegocio):
     """Código da cor fora do formato #RRGGBB."""
 
 
-class Cor:
+class Cor(Arquivavel):
     def __init__(self, nome, codigo_hex=None):
+        self.ativo = True
         self.nome = texto_obrigatorio(nome, "nome da cor")
         if codigo_hex is not None and not FORMATO_HEX.fullmatch(codigo_hex):
             raise CorInvalidaError("O código da cor precisa ser no formato #RRGGBB, por exemplo #315A81.")
