@@ -2,6 +2,8 @@
 Testes dos cadastros: cor, categoria e material.
 """
 
+from decimal import Decimal
+
 import pytest
 
 from apps.cadastros.dominio import (
@@ -76,3 +78,13 @@ def deve_criar_material_ativo_com_categoria_de_material():
 def nao_deve_aceitar_categoria_de_producao():
     with pytest.raises(CategoriaIncompativelError):
         Material("Tecido Oxford", SAIA, METRO)
+
+
+# Cada cor do material tem o seu estoque: saldo, custo e mínimo próprios.
+def deve_adicionar_cor_com_estoque_proprio():
+    oxford = Material("Tecido Oxford", TECIDO, METRO)
+    azul = oxford.adicionar_cor(Cor("Azul"), "5", "10", "7")
+    assert azul.saldo == Decimal("10.000")
+    assert azul.custo_medio == Decimal("7.00")
+    assert azul.qtd_estoque_minimo == Decimal("5.000")
+    assert oxford.cores() == ["Azul"]
