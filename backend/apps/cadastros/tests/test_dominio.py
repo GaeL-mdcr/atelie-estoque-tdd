@@ -5,7 +5,7 @@ Testes dos cadastros: cor, categoria e material.
 import pytest
 
 from apps.cadastros.dominio import Categoria, Cor, CorInvalidaError
-from apps.comum.erros import ValorObrigatorioError
+from apps.comum.erros import ValorInvalidoError, ValorObrigatorioError
 
 
 def deve_guardar_nome_limpo_e_hex_em_maiusculas():
@@ -32,3 +32,13 @@ def nao_deve_aceitar_nome_vazio():
         Cor("   ")
     with pytest.raises(ValorObrigatorioError):
         Categoria("", "M")
+
+
+# M = categoria de material (Tecido), P = categoria de produção (Saia). Não existe outro tipo.
+def deve_criar_categoria_de_material_ou_producao():
+    tecido = Categoria(" Tecido ", "M")
+    assert tecido.nome == "Tecido"
+    assert tecido.tipo == "M"
+    assert Categoria("Saia", "P").tipo == Categoria.PRODUCAO
+    with pytest.raises(ValorInvalidoError):
+        Categoria("Saia", "X")
