@@ -145,3 +145,8 @@ def deve_calcular_os_custos_da_saia_midi(saia, azul):
     saia.registrar_retorno(uso.id, azul, "0.5", T2)
     assert saia.custo_materiais() == Decimal("11.50")
     assert saia.custo_total() == Decimal("71.50")
+
+
+def deve_ter_custo_so_de_mao_de_obra_sem_movimentacoes(saia):
+    assert saia.custo_materiais() == Decimal("0.00")
+    assert saia.custo_total() == Decimal("60.00")
