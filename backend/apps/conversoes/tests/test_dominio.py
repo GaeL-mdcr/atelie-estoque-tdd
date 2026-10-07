@@ -18,3 +18,11 @@ def deve_calcular_fator_quando_um_rolo_vale_cinquenta_metros():
 
 def deve_calcular_fator_quando_tres_unidades_valem_uma():
     assert ConversaoUnidade(TECIDO, ROLO, "3", "1").fator() == Decimal("0.333333")
+
+
+def deve_converter_quantidade_comprada_para_unidade_de_estoque():
+    rolo = ConversaoUnidade(TECIDO, ROLO, "1", "50")
+    assert rolo.converter("2") == Decimal("100.000")
+    assert rolo.converter("1.5") == Decimal("75.000")
+    # 3 × 0,333333 = 0,999999, que arredondado para 3 casas dá 1,000.
+    assert ConversaoUnidade(TECIDO, ROLO, "3", "1").converter("3") == Decimal("1.000")
