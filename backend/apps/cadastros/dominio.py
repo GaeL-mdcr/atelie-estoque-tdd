@@ -36,3 +36,15 @@ class Categoria:
         if tipo not in (self.MATERIAL, self.PRODUCAO):
             raise ValorInvalidoError("A categoria precisa ser de material (M) ou de produção (P).")
         self.tipo = tipo
+
+
+class Material(Arquivavel):
+    def __init__(self, nome, categoria, unidade_estoque_id, descricao=""):
+        self.ativo = True
+        self.nome = nome
+        self.categoria = categoria
+        self.unidade_estoque_id = unidade_estoque_id
+        self.descricao = descricao
+
+    def cores(self):
+        return []
