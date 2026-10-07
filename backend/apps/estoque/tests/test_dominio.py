@@ -104,3 +104,9 @@ def nao_deve_aceitar_quantidade_que_arredonda_para_zero():
         estoque.registrar_entrada("0.0001", "1")
     with pytest.raises(QuantidadeInvalidaError):
         estoque.registrar_retorno("0.0004", "1")
+
+
+# O id diz de qual material + cor é este estoque; a produção usa isso para não misturar cores.
+def deve_guardar_o_id_da_variante():
+    assert EstoqueVariante("1", "1", variante_id=10).variante_id == 10
+    assert EstoqueVariante().variante_id is None
