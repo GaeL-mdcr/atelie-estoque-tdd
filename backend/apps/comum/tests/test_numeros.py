@@ -25,3 +25,10 @@ def deve_converter_texto_e_inteiro_para_decimal():
 def nao_deve_aceitar_float_nem_bool(valor):
     with pytest.raises(ValorInvalidoError):
         decimal_de(valor)
+
+
+# NaN e Infinity são Decimal válidos para o Python, mas não existe "infinito metros" de tecido.
+@pytest.mark.parametrize("valor", ["abc", "", None, "NaN", "Infinity"])
+def nao_deve_aceitar_valor_que_nao_e_numero(valor):
+    with pytest.raises(ValorInvalidoError):
+        decimal_de(valor)
