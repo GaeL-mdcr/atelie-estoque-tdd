@@ -30,11 +30,12 @@ class ItemCompra:
     def __init__(self, variante_id, material_id, unidade_compra_id, unidade_estoque_id,
                  qtd_compra, vl_unitario_compra, conversao=None):
         self.variante_id = variante_id
-        self.qtd_compra = quantidade(exigir_positivo(qtd_compra, "quantidade comprada"))
+        self.qtd_compra = exigir_positivo(quantidade(qtd_compra), "quantidade comprada")
         self.vl_unitario_compra = dinheiro(exigir_nao_negativo(vl_unitario_compra, "preço unitário"))
         # A entrada é calculada uma vez só e fica guardada: é o histórico da compra (RN09).
-        self.qtd_entrada_estoque = self._calcular_entrada(
-            material_id, unidade_compra_id, unidade_estoque_id, conversao
+        self.qtd_entrada_estoque = exigir_positivo(
+            self._calcular_entrada(material_id, unidade_compra_id, unidade_estoque_id, conversao),
+            "quantidade que entra no estoque",
         )
 
     def _calcular_entrada(self, material_id, unidade_compra_id, unidade_estoque_id, conversao):
