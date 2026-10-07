@@ -24,6 +24,10 @@ class VarianteDuplicadaError(ErroDeNegocio):
     """A mesma cor cadastrada duas vezes no mesmo material."""
 
 
+class VarianteNaoEncontradaError(ErroDeNegocio):
+    """O material não tem essa cor cadastrada."""
+
+
 class Cor(Arquivavel):
     def __init__(self, nome, codigo_hex=None):
         self.ativo = True
@@ -76,3 +80,4 @@ class Material(Arquivavel):
         for existente, estoque in self._variantes:
             if existente.chave() == cor.chave():
                 return estoque
+        raise VarianteNaoEncontradaError(f"Este material não tem a cor {cor.rotulo()} cadastrada.")
