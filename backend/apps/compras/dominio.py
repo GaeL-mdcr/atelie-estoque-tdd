@@ -14,6 +14,10 @@ class ConversaoIncompativelError(ErroDeNegocio):
     """A conversão informada é de outro material ou de outra unidade de compra."""
 
 
+class CompraSemItensError(ErroDeNegocio):
+    """Tentou confirmar uma compra vazia."""
+
+
 class ItemCompra:
     def __init__(self, variante_id, material_id, unidade_compra_id, unidade_estoque_id,
                  qtd_compra, vl_unitario_compra, conversao=None):
@@ -69,4 +73,6 @@ class Compra:
         del self._itens[posicao]
 
     def confirmar(self):
+        if not self._itens:
+            raise CompraSemItensError("Adicione pelo menos um item antes de confirmar a compra.")
         self.confirmada = True
