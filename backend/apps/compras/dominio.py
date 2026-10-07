@@ -61,3 +61,6 @@ class Compra:
 
     def adicionar_item(self, item):
         self._itens.append(item)
+
+    def editar_item(self, posicao, item):
+        self._itens[posicao] = item
