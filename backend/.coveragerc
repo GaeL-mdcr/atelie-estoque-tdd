@@ -1,0 +1,11 @@
+[run]
+source = apps
+# Testes, migrations e configuração não contam como código de produção.
+omit =
+    */tests/*
+    */migrations/*
+    */apps.py
+
+[report]
+show_missing = True
+skip_empty = True

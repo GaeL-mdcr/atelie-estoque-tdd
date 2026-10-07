@@ -1,0 +1,29 @@
+name: atelie
+description: App do ateliê para celular e web — estoque por material e cor, compras e produções.
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.8.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Estado e injeção de dependências (facilita trocar o repositório real por um falso nos testes)
+  flutter_riverpod: ^3.0.0
+  # SQLite local com Stream de consultas; funciona no celular e na web
+  drift: ^2.28.0
+  drift_flutter: ^0.2.7
+  # Navegação entre telas
+  go_router: ^16.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  # Gera o código das tabelas do Drift
+  drift_dev: ^2.28.0
+  build_runner: ^2.7.0
+
+flutter:
+  uses-material-design: true

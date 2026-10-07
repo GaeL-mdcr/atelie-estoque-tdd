@@ -1,0 +1,33 @@
+# ---------- Python / Django ----------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+backend/db.sqlite3
+backend/db.sqlite3-journal
+backend/media/
+backend/staticfiles/
+.env
+
+# ---------- Flutter / Dart ----------
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/build/
+app/coverage/
+app/.packages
+app/pubspec.lock.bak
+*.g.dart.bak
+
+# ---------- Editores e sistema ----------
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db

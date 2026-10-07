@@ -1,0 +1,5 @@
+# Tudo de requirements.txt + ferramentas de teste
+-r requirements.txt
+pytest>=8,<9
+pytest-django>=4.9,<5
+pytest-cov>=5,<8
