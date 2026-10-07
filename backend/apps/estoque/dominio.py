@@ -4,7 +4,17 @@ Estoque de uma variante (material + cor): saldo e custo médio ponderado.
 Cada cor tem o seu: mexer no Azul não muda o Branco do mesmo tecido.
 """
 
+from apps.comum.erros import ErroDeNegocio
 from apps.comum.numeros import decimal_de, dinheiro, quantidade
+
+
+class SaldoInsuficienteError(ErroDeNegocio):
+    """Pediu mais material do que tem no estoque daquela cor."""
+
+    def __init__(self, disponivel):
+        self.disponivel = disponivel
+        texto = format(disponivel.normalize(), "f").replace(".", ",")
+        super().__init__(f"Não tem material suficiente. Disponível: {texto}.")
 
 
 class EstoqueVariante:
@@ -27,5 +37,8 @@ class EstoqueVariante:
         self._custo_medio = dinheiro(valor_em_estoque / self._saldo)
 
     def registrar_saida(self, qtd):
-        self._saldo = quantidade(self._saldo - quantidade(qtd))
+        qtd = quantidade(qtd)
+        if qtd > self._saldo:
+            raise SaldoInsuficienteError(self._saldo)
+        self._saldo = quantidade(self._saldo - qtd)
         return self._custo_medio
