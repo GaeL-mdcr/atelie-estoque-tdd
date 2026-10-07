@@ -10,7 +10,7 @@ from decimal import Decimal
 
 from apps.cadastros.dominio import Categoria, CategoriaIncompativelError
 from apps.comum.erros import ErroDeNegocio, ValorObrigatorioError
-from apps.comum.numeros import dinheiro, formatar, quantidade, texto_obrigatorio
+from apps.comum.numeros import dinheiro, exigir_nao_negativo, formatar, quantidade, texto_obrigatorio
 
 USO = "U"
 RETORNO = "R"
@@ -67,8 +67,8 @@ class Producao:
             raise CategoriaIncompativelError("Escolha uma categoria de produção, como Saia ou Vestido.")
         self.categoria = categoria
         self.usuario_id = usuario_id
-        self.vl_mao_obra = dinheiro(vl_mao_obra)
-        self.vl_venda = dinheiro(vl_venda)
+        self.vl_mao_obra = dinheiro(exigir_nao_negativo(vl_mao_obra, "mão de obra"))
+        self.vl_venda = dinheiro(exigir_nao_negativo(vl_venda, "preço de venda"))
         self.pasta_id = pasta_id
         self.descricao = descricao
         self._movimentacoes = []
