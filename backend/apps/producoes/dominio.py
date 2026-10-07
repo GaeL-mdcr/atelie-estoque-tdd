@@ -74,6 +74,7 @@ class Producao:
         self._movimentacoes = []
         self.dt_finalizacao = None
         self._reaberturas = []
+        self.publicada = False
 
     @property
     def concluida(self):
@@ -94,6 +95,14 @@ class Producao:
 
     def historico_reaberturas(self):
         return tuple(self._reaberturas)
+
+    def publicar_na_vitrine(self):
+        if not self.concluida:
+            raise ProducaoNaoConcluidaError("Só peça concluída pode ir para a vitrine.")
+        self.publicada = True
+
+    def retirar_da_vitrine(self):
+        self.publicada = False
 
     def registrar_uso(self, estoque, qtd, quando):
         self._exigir_em_andamento()
