@@ -7,7 +7,7 @@ e esse resto aparece no custo médio depois de algumas compras.
 
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
-from apps.comum.erros import ValorInvalidoError
+from apps.comum.erros import QuantidadeInvalidaError, ValorInvalidoError, ValorObrigatorioError
 
 CASAS_QUANTIDADE = Decimal("0.001")
 CASAS_DINHEIRO = Decimal("0.01")
@@ -45,3 +45,24 @@ def dinheiro(valor):
 
 def fator(valor):
     return _arredondar(valor, CASAS_FATOR)
+
+
+def exigir_positivo(valor, campo):
+    numero = decimal_de(valor)
+    if numero <= 0:
+        raise QuantidadeInvalidaError(f"O campo {campo} precisa ser maior que zero.")
+    return numero
+
+
+def exigir_nao_negativo(valor, campo):
+    numero = decimal_de(valor)
+    if numero < 0:
+        raise ValorInvalidoError(f"O campo {campo} não pode ser negativo.")
+    return numero
+
+
+def texto_obrigatorio(texto, campo):
+    limpo = (texto or "").strip()
+    if not limpo:
+        raise ValorObrigatorioError(f"Preencha o campo {campo}.")
+    return limpo
