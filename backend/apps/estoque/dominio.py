@@ -42,3 +42,9 @@ class EstoqueVariante:
             raise SaldoInsuficienteError(self._saldo)
         self._saldo = quantidade(self._saldo - qtd)
         return self._custo_medio
+
+    def registrar_retorno(self, qtd, custo_unitario):
+        qtd = quantidade(qtd)
+        valor_em_estoque = self._saldo * self._custo_medio + qtd * decimal_de(custo_unitario)
+        self._saldo = quantidade(self._saldo + qtd)
+        self._custo_medio = dinheiro(valor_em_estoque / self._saldo)
