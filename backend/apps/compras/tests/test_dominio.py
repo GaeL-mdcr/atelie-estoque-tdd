@@ -5,7 +5,9 @@ e a compra junta os itens até ser confirmada.
 
 from decimal import Decimal
 
-from apps.compras.dominio import ItemCompra
+import pytest
+
+from apps.compras.dominio import ConversaoAusenteError, ItemCompra
 from apps.conversoes.dominio import ConversaoUnidade
 
 AZUL = 10  # variante Tecido Oxford Azul
@@ -51,3 +53,8 @@ def nao_deve_mudar_a_entrada_quando_a_conversao_muda_depois():
     item = item_em_rolo("2", "80", rolo)
     rolo.alterar("1", "25")
     assert item.qtd_entrada_estoque == Decimal("40.000")
+
+
+def nao_deve_aceitar_unidade_diferente_sem_conversao():
+    with pytest.raises(ConversaoAusenteError):
+        item_em_rolo("2", "80", None)
