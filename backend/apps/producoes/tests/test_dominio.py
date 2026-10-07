@@ -9,7 +9,7 @@ from decimal import Decimal
 import pytest
 
 from apps.cadastros.dominio import Categoria, CategoriaIncompativelError
-from apps.comum.erros import ValorObrigatorioError
+from apps.comum.erros import ValorInvalidoError, ValorObrigatorioError
 from apps.estoque.dominio import EstoqueVariante, SaldoInsuficienteError
 from apps.producoes.dominio import (
     Producao,
@@ -230,3 +230,11 @@ def deve_expor_so_os_dados_publicos(saia, azul):
         "descricao": "",
         "vl_venda": Decimal("220.00"),
     }
+
+
+# RN-T01 vale para a produção também: mão de obra e preço de venda não podem ser negativos.
+def nao_deve_aceitar_mao_de_obra_ou_venda_negativa():
+    with pytest.raises(ValorInvalidoError):
+        Producao("Saia midi", SAIA, 1, vl_mao_obra="-60")
+    with pytest.raises(ValorInvalidoError):
+        Producao("Saia midi", SAIA, 1, vl_venda="-1")
