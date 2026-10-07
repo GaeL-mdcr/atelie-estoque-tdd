@@ -87,6 +87,17 @@ class Producao:
         )
         return quantidade(uso.quantidade - devolvido)
 
+    def custo_materiais(self):
+        # Usos somam e retornos subtraem, cada um com o custo que ficou gravado nele.
+        total = Decimal("0")
+        for movimentacao in self._movimentacoes:
+            valor = movimentacao.quantidade * movimentacao.custo_unitario
+            total += valor if movimentacao.tipo == USO else -valor
+        return dinheiro(total)
+
+    def custo_total(self):
+        return dinheiro(self.custo_materiais() + self.vl_mao_obra)
+
     def _uso(self, id_uso):
         for movimentacao in self._movimentacoes:
             if movimentacao.id == id_uso and movimentacao.tipo == USO:
