@@ -4,7 +4,7 @@ Estoque de uma variante (material + cor): saldo e custo médio ponderado.
 Cada cor tem o seu: mexer no Azul não muda o Branco do mesmo tecido.
 """
 
-from apps.comum.numeros import dinheiro, quantidade
+from apps.comum.numeros import decimal_de, dinheiro, quantidade
 
 
 class EstoqueVariante:
@@ -19,3 +19,9 @@ class EstoqueVariante:
     @property
     def custo_medio(self):
         return self._custo_medio
+
+    def registrar_entrada(self, qtd, custo_total):
+        qtd = quantidade(qtd)
+        valor_em_estoque = self._saldo * self._custo_medio + decimal_de(custo_total)
+        self._saldo = quantidade(self._saldo + qtd)
+        self._custo_medio = dinheiro(valor_em_estoque / self._saldo)
