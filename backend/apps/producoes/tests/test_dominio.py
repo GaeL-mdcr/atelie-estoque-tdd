@@ -93,3 +93,16 @@ def nao_deve_devolver_mais_que_o_devolvivel(saia, azul):
         saia.registrar_retorno(uso.id, azul, "0.501", T2)
     assert azul.saldo == Decimal("49.500")
     assert len(saia.movimentacoes()) == 2
+
+
+# Decisão D05 com dois custos diferentes: o retorno volta com o custo do SEU uso, não com a média de hoje.
+def deve_devolver_com_o_custo_do_uso_de_origem(saia):
+    azul = EstoqueVariante("10", "4", variante_id=10)
+    uso1 = saia.registrar_uso(azul, "2", T1)          # R$ 4,00
+    azul.registrar_entrada("10", "100")               # (8 × 4 + 100) ÷ 18 = R$ 7,33
+    uso2 = saia.registrar_uso(azul, "2", T2)          # R$ 7,33
+    retorno = saia.registrar_retorno(uso1.id, azul, "1", T2)
+    assert uso2.custo_unitario == Decimal("7.33")
+    assert retorno.custo_unitario == Decimal("4.00")
+    assert azul.saldo == Decimal("17.000")
+    assert azul.custo_medio == Decimal("7.13")        # (16 × 7,33 + 1 × 4,00) ÷ 17
