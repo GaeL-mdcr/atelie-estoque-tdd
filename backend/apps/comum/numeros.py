@@ -9,15 +9,18 @@ from decimal import Decimal, InvalidOperation
 
 from apps.comum.erros import ValorInvalidoError
 
+NAO_E_NUMERO = "Esse valor não é um número que o ateliê consiga usar."
+
 
 def decimal_de(valor):
-    # bool vem antes de int de propósito: True também é int para o Python.
+    # bool e float são recusados antes de tudo: True é o número 1 para o Python
+    # e 0.1 já chega com sujeira de arredondamento.
     if isinstance(valor, (bool, float)):
-        raise ValorInvalidoError("Esse valor não é um número que o ateliê consiga usar.")
+        raise ValorInvalidoError(NAO_E_NUMERO)
     try:
         numero = Decimal(valor)
     except (InvalidOperation, TypeError):
-        raise ValorInvalidoError("Esse valor não é um número que o ateliê consiga usar.") from None
+        raise ValorInvalidoError(NAO_E_NUMERO) from None
     if not numero.is_finite():
-        raise ValorInvalidoError("Esse valor não é um número que o ateliê consiga usar.")
+        raise ValorInvalidoError(NAO_E_NUMERO)
     return numero
