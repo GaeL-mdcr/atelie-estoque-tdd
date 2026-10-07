@@ -13,7 +13,7 @@ e o histórico de commits mostra isso.
 
 > Status: **Semana 1 — estrutura e requisitos.** Ainda não existe código de produção.
 
-## Arquitetura em uma frase
+## Arquitetura
 
 App **Flutter** (celular + web) com **SQLite local** para funcionar offline, conversando com uma
 **API Django** que é a fonte oficial das regras e do banco. O site **vitrine** fica reservado
