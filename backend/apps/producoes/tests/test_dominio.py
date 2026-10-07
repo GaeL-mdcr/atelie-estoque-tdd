@@ -171,3 +171,19 @@ def nao_deve_concluir_duas_vezes(saia):
     with pytest.raises(ProducaoConcluidaError):
         saia.concluir(date(2026, 10, 21))
     assert saia.dt_finalizacao == CONCLUSAO
+
+
+# Reabrir guarda quem, quando e por quê (decisão D06), e a peça volta a aceitar material.
+def deve_reabrir_com_motivo_e_guardar_historico(saia, azul):
+    saia.concluir(CONCLUSAO)
+    evento = saia.reabrir("Cliente pediu ajuste na barra", usuario_id=1, quando=T2)
+    assert saia.concluida is False
+    assert saia.dt_finalizacao is None
+    assert evento.motivo == "Cliente pediu ajuste na barra"
+    assert evento.usuario_id == 1
+    assert evento.quando == T2
+    assert evento.dt_finalizacao_anterior == CONCLUSAO
+    saia.registrar_uso(azul, "1", T2)
+    saia.concluir(date(2026, 10, 25))
+    saia.reabrir("Trocar botões", usuario_id=1, quando=T2)
+    assert [e.motivo for e in saia.historico_reaberturas()] == ["Cliente pediu ajuste na barra", "Trocar botões"]
