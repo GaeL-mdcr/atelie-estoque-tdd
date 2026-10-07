@@ -63,3 +63,15 @@ def nao_deve_usar_mais_que_o_saldo(saia):
     with pytest.raises(SaldoInsuficienteError):
         saia.registrar_uso(pouco, "2.5", T1)
     assert saia.movimentacoes() == ()
+
+
+# O retorno aponta para o uso de origem e volta com o custo dele. O uso não é apagado.
+def deve_registrar_retorno_apontando_para_o_uso(saia, azul):
+    uso = saia.registrar_uso(azul, "3", T1)
+    retorno = saia.registrar_retorno(uso.id, azul, "0.5", T2)
+    assert retorno.tipo == "R"
+    assert retorno.id_uso_origem == uso.id
+    assert retorno.custo_unitario == Decimal("4.60")
+    assert retorno.quantidade == Decimal("0.500")
+    assert azul.saldo == Decimal("47.500")
+    assert saia.movimentacoes() == (uso, retorno)
