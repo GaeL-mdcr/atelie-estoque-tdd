@@ -11,7 +11,10 @@ class ItemCompra:
         self.variante_id = variante_id
         self.qtd_compra = quantidade(qtd_compra)
         self.vl_unitario_compra = dinheiro(vl_unitario_compra)
-        self.qtd_entrada_estoque = self.qtd_compra
+        if unidade_compra_id == unidade_estoque_id:
+            self.qtd_entrada_estoque = self.qtd_compra
+        else:
+            self.qtd_entrada_estoque = conversao.converter(self.qtd_compra)
 
     def total(self):
         return dinheiro(self.qtd_compra * self.vl_unitario_compra)
