@@ -9,7 +9,13 @@ from decimal import Decimal
 import pytest
 
 from apps.comum.erros import QuantidadeInvalidaError, ValorInvalidoError
-from apps.compras.dominio import Compra, ConversaoAusenteError, ConversaoIncompativelError, ItemCompra
+from apps.compras.dominio import (
+    Compra,
+    CompraSemItensError,
+    ConversaoAusenteError,
+     ConversaoIncompativelError,
+    ItemCompra,
+)
 from apps.conversoes.dominio import ConversaoUnidade
 
 AZUL = 10  # variante Tecido Oxford Azul
@@ -125,3 +131,9 @@ def deve_remover_item_e_ajustar_o_total(compra):
 def deve_confirmar_compra_com_itens(compra):
     com_dois_itens(compra).confirmar()
     assert compra.confirmada is True
+
+
+def nao_deve_confirmar_compra_sem_itens(compra):
+    with pytest.raises(CompraSemItensError):
+        compra.confirmar()
+    assert compra.confirmada is False
