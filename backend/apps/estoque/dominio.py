@@ -35,18 +35,18 @@ class EstoqueVariante:
         return self._saldo < self._qtd_estoque_minimo
 
     def registrar_entrada(self, qtd, custo_total):
-        qtd = quantidade(exigir_positivo(qtd, "quantidade"))
+        qtd = exigir_positivo(quantidade(qtd), "quantidade")
         self._somar_com_media_ponderada(qtd, exigir_nao_negativo(custo_total, "custo da compra"))
 
     def registrar_saida(self, qtd):
-        qtd = quantidade(exigir_positivo(qtd, "quantidade"))
+        qtd = exigir_positivo(quantidade(qtd), "quantidade")
         if qtd > self._saldo:
             raise SaldoInsuficienteError(self._saldo)
         self._saldo = quantidade(self._saldo - qtd)
         return self._custo_medio
 
     def registrar_retorno(self, qtd, custo_unitario):
-        qtd = quantidade(exigir_positivo(qtd, "quantidade"))
+        qtd = exigir_positivo(quantidade(qtd), "quantidade")
         self._somar_com_media_ponderada(qtd, qtd * exigir_nao_negativo(custo_unitario, "custo do uso"))
 
     def _somar_com_media_ponderada(self, qtd, valor_que_entra):
