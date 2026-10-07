@@ -7,6 +7,7 @@ from decimal import Decimal
 
 import pytest
 
+from apps.comum.erros import QuantidadeInvalidaError, ValorInvalidoError
 from apps.compras.dominio import ConversaoAusenteError, ConversaoIncompativelError, ItemCompra
 from apps.conversoes.dominio import ConversaoUnidade
 
@@ -68,3 +69,12 @@ def nao_deve_aceitar_unidade_diferente_sem_conversao():
 def nao_deve_aceitar_conversao_que_nao_e_deste_material_e_unidade(conversao):
     with pytest.raises(ConversaoIncompativelError):
         item_em_rolo("2", "80", conversao)
+
+
+# Preço zero pode (brinde do fornecedor); negativo não. Quantidade tem que ser maior que zero.
+def nao_deve_aceitar_preco_negativo_nem_quantidade_zero():
+    with pytest.raises(ValorInvalidoError):
+        item_em_metro("1", "-1")
+    with pytest.raises(QuantidadeInvalidaError):
+        item_em_metro("0", "5")
+    assert item_em_metro("2", "0").custo_unitario_entrada() == Decimal("0.00")
