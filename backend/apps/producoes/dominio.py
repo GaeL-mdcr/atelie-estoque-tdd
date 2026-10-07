@@ -54,3 +54,11 @@ class Producao:
 
     def movimentacoes(self):
         return tuple(self._movimentacoes)
+
+    def registrar_retorno(self, id_uso_origem, estoque, qtd, quando):
+        uso = next(m for m in self._movimentacoes if m.id == id_uso_origem)
+        qtd = quantidade(qtd)
+        estoque.registrar_retorno(qtd, uso.custo_unitario)
+        retorno = MovimentacaoMaterial(RETORNO, uso.variante_id, qtd, uso.custo_unitario, quando, uso.id)
+        self._movimentacoes.append(retorno)
+        return retorno
