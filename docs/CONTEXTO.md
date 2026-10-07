@@ -70,7 +70,7 @@ Origem: **Doc** = já estava nos documentos; **07/10** = fechada na conversa de 
 
 ## 4. Estado atual
 
-**Semana 1 — Etapas 1 e 2.**
+**Semana 2 — Fase 1 concluída** (branch `claude/codespaces-fase1-deuu9l`, PR para `main`).
 
 - [x] Repositório criado no GitHub (público)
 - [x] Estrutura vazia do backend (módulos Django sem código de regra)
@@ -78,11 +78,15 @@ Origem: **Doc** = já estava nos documentos; **07/10** = fechada na conversa de 
 - [x] Casca do app Flutter (`pubspec.yaml`, `lib/main.dart`, pastas por funcionalidade)
 - [x] README inicial
 - [x] `docs/requisitos.md` (Etapa 1)
-- [ ] **Rodar os testes de configuração na máquina local** (ver seção 6 — ainda não foram executados)
-- [ ] Gerar pastas de plataforma do Flutter (`flutter create --platforms=android,web .`) e conferir `flutter pub get`
-- [ ] Primeiro ciclo TDD: `ConversaoUnidade.fator()`
+- [x] Testes de configuração rodados: **3 passando** (Python 3.13, Django 5.2.18, pytest 9.1.1)
+- [x] Pastas de plataforma do Flutter geradas (`android/`, `web/`) e `flutter pub get` sem conflito
+- [x] Ambiente do **GitHub Codespaces** (`.devcontainer/`): Python 3.12 + Flutter stable
+- [x] **Fase 1 — domínio do backend:** 7 classes em `apps/*/dominio.py` + `apps/comum`,
+      **92 testes passando, 100% de cobertura** do código de domínio
+- [ ] Plano detalhado da Fase 2 (models + migrations)
 
-Código de produção existente: **nenhum** (só configuração).
+Código de produção existente: só o domínio em Python puro (`apps/comum/*.py` e `apps/*/dominio.py`),
+sem nenhuma importação de Django.
 
 ## 5. Mudanças no modelo em relação ao Lógico_1
 
@@ -103,13 +107,18 @@ Quando os *models* Django forem criados (sempre a partir de testes), aplicar:
 
 ## 6. Ambiente e limitações conhecidas
 
-- O ambiente de nuvem onde a estrutura foi montada **não tem acesso ao PyPI nem ao download
-  do Flutter**. Por isso `pytest` e `flutter test` ainda **não foram executados**; o código
-  Python foi checado só quanto à sintaxe. A execução real acontece na máquina do Gabriel (Windows).
-- Versões do `pubspec.yaml` foram escritas sem rodar `pub get`. Se der conflito:
-  `flutter pub upgrade --major-versions` e registrar aqui as versões que ficaram.
+- **GitHub Codespaces** (desde 07/10): `.devcontainer/devcontainer.json` usa a imagem
+  `mcr.microsoft.com/devcontainers/python:3.12-bookworm`; o `pos-criacao.sh` cria o venv do
+  backend, clona o Flutter stable em `~/flutter` e roda o `pub get` do app. Portas 8000 (Django)
+  e 8080 (Flutter web) já ficam encaminhadas.
+- O ambiente de nuvem do Claude Code agora acessa o PyPI e o download do Flutter: a Fase 0 e a
+  Fase 1 rodaram lá de verdade (Python 3.13.16, Django 5.2.18, pytest 9.1.1, Flutter 3.47.6 / Dart 3.13.5).
+- Versões que o `pub get` resolveu: flutter_riverpod 3.4.3 · drift 2.31.0 · drift_flutter 0.2.8 ·
+  go_router 16.3.0 · drift_dev 2.31.0 · build_runner 2.15.1 · flutter_lints 6.0.0. O `pubspec.lock` está no repositório.
 - O link do Figma só expõe a página do design system (*DS 10 • Components*); as telas são
   descritas pela Interface V2.2.
+- O `CLAUDE.md` foi apagado pelo site no commit `7535c83`; as regras dele continuam valendo
+  (estão neste diário e na seção 8).
 
 Comandos:
 
@@ -134,17 +143,39 @@ Detalhes de assinatura e erros em [`requisitos.md`](requisitos.md).
 Planos:
 - Roteiro de todas as fases: [`superpowers/plans/2026-10-07-roteiro-ponta-a-ponta.md`](superpowers/plans/2026-10-07-roteiro-ponta-a-ponta.md)
 - Passo a passo da Fase 1 (domínio): [`superpowers/plans/2026-10-07-fase1-dominio-backend.md`](superpowers/plans/2026-10-07-fase1-dominio-backend.md)
-- Execução no ambiente de nuvem: só a Fase 1 roda lá (pytest 9 isolado em `/root/.local/bin/pytest`, sem Django).
+- Execução: Fase 1 feita no ambiente de nuvem com o venv completo (Django incluso); dá para repetir no Codespaces.
 
 **Backend — domínio (Python puro)**
 
-- [ ] `ConversaoUnidade`: fator · converter · atende · equivalência ≤ 0 · converter ≤ 0
-- [ ] `ItemCompra`: total · entrada sem conversão · entrada com conversão · custo de entrada · sem conversão → erro · conversão de outro material → erro · preço negativo → erro · entrada não muda se a conversão mudar
-- [ ] `Compra`: adicionar · total · editar · remover · confirmar · confirmar vazia → erro · mexer depois de confirmada → erro · posição inexistente → erro
-- [ ] `EstoqueVariante`: saldo inicial · entrada + média ponderada (exemplo 4,60) · saída devolve custo vigente · saída > saldo → erro com disponível · retorno + média · abaixo do mínimo · quantidade ≤ 0 → erro
-- [ ] `Cor`: hex válido/opcional · hex inválido → erro · nome vazio → erro · rótulo
-- [ ] `Material`: categoria M · categoria P → erro · adicionar cor · cor repetida → erro · arquivar/reativar
-- [ ] `Producao`: uso com custo vigente · uso sem saldo → erro · retorno com origem e custo do uso · devolvível · retorno acima → erro · uso inexistente → erro · custos (11,50 / 71,50) · concluir bloqueia · reabrir com motivo e histórico · reabrir sem motivo → erro · publicar só concluída · dados públicos sem custo
+- [x] `ConversaoUnidade`: fator · converter · atende · equivalência ≤ 0 · converter ≤ 0
+- [x] `ItemCompra`: total · entrada sem conversão · entrada com conversão · custo de entrada · sem conversão → erro · conversão de outro material → erro · preço negativo → erro · entrada não muda se a conversão mudar
+- [x] `Compra`: adicionar · total · editar · remover · confirmar · confirmar vazia → erro · mexer depois de confirmada → erro · posição inexistente → erro
+- [x] `EstoqueVariante`: saldo inicial · entrada + média ponderada (exemplo 4,60) · saída devolve custo vigente · saída > saldo → erro com disponível · retorno + média · abaixo do mínimo · quantidade ≤ 0 → erro
+- [x] `Cor`: hex válido/opcional · hex inválido → erro · nome vazio → erro · rótulo
+- [x] `Material`: categoria M · categoria P → erro · adicionar cor · cor repetida → erro · arquivar/reativar
+- [x] `Producao`: uso com custo vigente · uso sem saldo → erro · retorno com origem e custo do uso · devolvível · retorno acima → erro · uso inexistente → erro · custos (11,50 / 71,50) · concluir bloqueia · reabrir com motivo e histórico · reabrir sem motivo → erro · publicar só concluída · dados públicos sem custo
+
+**O que a Fase 1 ensinou (material para a `analise-beneficios.md`)**
+
+Bugs que os testes pegaram antes de chegar no banco:
+
+1. **Quantidade que arredonda para zero.** `0,0001 m` passava no `exigir_positivo`, virava `0,000`
+   depois do arredondamento de 3 casas e, num estoque vazio, a média ponderada dividia por zero.
+   Correção: arredondar primeiro e validar depois (ciclo extra na Tarefa 5).
+2. **O mesmo no item de compra:** `0,001 rolo` com "3 rolos = 1 m" entrava como `0,000 m` e o custo
+   de entrada dividia por zero. Agora o item exige que a entrada no estoque seja maior que zero.
+3. **Hex com quebra de linha.** A regex `^#…$` aceitava `"#315A81\n"`, porque o `$` do Python casa
+   antes da quebra de linha final. Trocado por `fullmatch`.
+4. **Mão de obra negativa na produção** (lacuna do plano): RN-T01 não tinha teste na `Producao`;
+   uma mão de obra de −60 baixaria o custo total. Ciclo extra na Tarefa 9.
+
+Testes que já nasceram verdes (o comportamento veio de um ciclo anterior; commitados como
+`[GREEN] teste confirma …`, sem `[RED]`, como teste de regressão):
+fator fracionado (T2), entrada histórica da compra (T3), entrada em estoque vazio (T5), saída do
+saldo inteiro (T5), arquivar material sem perder cores (T7), custo do uso congelado (T8), retorno
+com dois custos diferentes, média R$ 7,13 (T8), custo só de mão de obra (T9).
+
+Números da fase: 67 commits `[RED]`, 75 `[GREEN]` (8 deles de testes que já passavam), 9 `[REFACTOR]`.
 
 **Backend — Django**
 
@@ -192,3 +223,4 @@ produção antes do teste custa 3 pontos.
 | 07/10/2026 | Leitura dos documentos (Drive + Figma); decisões D01–D14 fechadas; repositório criado; estrutura vazia + README (commit 1); requisitos e este diário (commit 2). | Rodar `pytest` localmente; começar `ConversaoUnidade` com o primeiro `[RED]`. |
 | 07/10/2026 | Roteiro ponta a ponta (8 fases) e plano detalhado da Fase 1 (10 tarefas, 71 ciclos). Requisitos ajustados: `registrar_uso(estoque, qtd, quando)`, `alterar`, `estoque_da_cor`, `chave`, `VarianteDiferenteError`, reabrir tira da vitrine (confirmado, D15). | Gabriel revisar o plano e escolher como executar. |
 | 07/10/2026 | Histórico regravado sem a linha de coautoria do Claude (autor continua o Gabriel). D15 confirmada. | Executar a Fase 1. |
+| 07/10/2026 | Codespaces configurado (`.devcontainer/`). Fase 0 verificada (3 testes, `pub get`, pastas Android/web). **Fase 1 completa** em ciclos RED/GREEN/REFACTOR: 92 testes, 100% de cobertura do domínio, 4 bugs pegos pelos testes (seção 7). | Revisar e fazer o merge do PR; escrever o plano detalhado da Fase 2 (models + migrations). |
