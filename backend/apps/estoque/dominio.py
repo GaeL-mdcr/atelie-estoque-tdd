@@ -31,10 +31,7 @@ class EstoqueVariante:
         return self._custo_medio
 
     def registrar_entrada(self, qtd, custo_total):
-        qtd = quantidade(qtd)
-        valor_em_estoque = self._saldo * self._custo_medio + decimal_de(custo_total)
-        self._saldo = quantidade(self._saldo + qtd)
-        self._custo_medio = dinheiro(valor_em_estoque / self._saldo)
+        self._somar_com_media_ponderada(quantidade(qtd), decimal_de(custo_total))
 
     def registrar_saida(self, qtd):
         qtd = quantidade(qtd)
@@ -45,6 +42,11 @@ class EstoqueVariante:
 
     def registrar_retorno(self, qtd, custo_unitario):
         qtd = quantidade(qtd)
-        valor_em_estoque = self._saldo * self._custo_medio + qtd * decimal_de(custo_unitario)
+        self._somar_com_media_ponderada(qtd, qtd * decimal_de(custo_unitario))
+
+    def _somar_com_media_ponderada(self, qtd, valor_que_entra):
+        # (saldo × média + o que entra) ÷ (saldo + qtd). O saldo novo nunca é zero
+        # aqui, então estoque vazio não dá divisão por zero: a média vira o custo que entrou.
+        valor_em_estoque = self._saldo * self._custo_medio + valor_que_entra
         self._saldo = quantidade(self._saldo + qtd)
         self._custo_medio = dinheiro(valor_em_estoque / self._saldo)
