@@ -93,3 +93,10 @@ def deve_comecar_como_rascunho_sem_itens(compra):
     assert compra.confirmada is False
     assert compra.itens == ()
     assert compra.total() == Decimal("0.00")
+
+
+def deve_somar_os_totais_dos_itens(compra):
+    compra.adicionar_item(item_em_rolo("2", "80", ConversaoUnidade(TECIDO, ROLO, "1", "20")))
+    compra.adicionar_item(item_em_metro("3", "7.50"))
+    assert len(compra.itens) == 2
+    assert compra.total() == Decimal("182.50")
