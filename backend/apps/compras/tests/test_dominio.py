@@ -3,12 +3,13 @@ Testes da compra: cada item sabe quanto custou e quanto entra no estoque,
 e a compra junta os itens até ser confirmada.
 """
 
+from datetime import datetime, timezone
 from decimal import Decimal
 
 import pytest
 
 from apps.comum.erros import QuantidadeInvalidaError, ValorInvalidoError
-from apps.compras.dominio import ConversaoAusenteError, ConversaoIncompativelError, ItemCompra
+from apps.compras.dominio import Compra, ConversaoAusenteError, ConversaoIncompativelError, ItemCompra
 from apps.conversoes.dominio import ConversaoUnidade
 
 AZUL = 10  # variante Tecido Oxford Azul
@@ -78,3 +79,17 @@ def nao_deve_aceitar_preco_negativo_nem_quantidade_zero():
     with pytest.raises(QuantidadeInvalidaError):
         item_em_metro("0", "5")
     assert item_em_metro("2", "0").custo_unitario_entrada() == Decimal("0.00")
+
+
+# ---------- Compra ----------
+
+
+@pytest.fixture
+def compra():
+    return Compra(fornecedor_id=1, usuario_id=1, data=datetime(2026, 9, 18, 17, 0, tzinfo=timezone.utc))
+
+
+def deve_comecar_como_rascunho_sem_itens(compra):
+    assert compra.confirmada is False
+    assert compra.itens == ()
+    assert compra.total() == Decimal("0.00")
