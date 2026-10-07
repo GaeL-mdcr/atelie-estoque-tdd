@@ -5,7 +5,7 @@ quando ficou pronta e se está na vitrine.
 
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
 from apps.cadastros.dominio import Categoria, CategoriaIncompativelError
@@ -45,6 +45,16 @@ class MovimentacaoMaterial:
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
 
+@dataclass(frozen=True)
+class EventoReabertura:
+    """Uma reabertura da produção: quem reabriu, quando, por quê e quando ela tinha sido concluída."""
+
+    usuario_id: int
+    motivo: str
+    quando: datetime
+    dt_finalizacao_anterior: date
+
+
 class Producao:
     def __init__(self, nome_peca, categoria, usuario_id, vl_mao_obra="0", vl_venda="0",
                  pasta_id=None, descricao=""):
@@ -59,6 +69,7 @@ class Producao:
         self.descricao = descricao
         self._movimentacoes = []
         self.dt_finalizacao = None
+        self._reaberturas = []
 
     @property
     def concluida(self):
@@ -67,6 +78,15 @@ class Producao:
     def concluir(self, data):
         self._exigir_em_andamento()
         self.dt_finalizacao = data
+
+    def reabrir(self, motivo, usuario_id, quando):
+        evento = EventoReabertura(usuario_id, motivo, quando, self.dt_finalizacao)
+        self.dt_finalizacao = None
+        self._reaberturas.append(evento)
+        return evento
+
+    def historico_reaberturas(self):
+        return tuple(self._reaberturas)
 
     def registrar_uso(self, estoque, qtd, quando):
         self._exigir_em_andamento()
