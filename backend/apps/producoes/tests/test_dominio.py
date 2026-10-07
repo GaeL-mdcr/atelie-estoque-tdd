@@ -49,3 +49,10 @@ def deve_registrar_uso_com_o_custo_medio_vigente(saia, azul):
     assert azul.saldo == Decimal("47.000")
     with pytest.raises(ValorObrigatorioError):
         saia.registrar_uso(EstoqueVariante("5", "1"), "1", T1)
+
+
+# Compra nova muda a média do estoque, mas o custo que ficou gravado no uso não muda.
+def deve_manter_o_custo_do_uso_quando_chega_compra_nova(saia, azul):
+    uso = saia.registrar_uso(azul, "3", T1)
+    azul.registrar_entrada("10", "100")
+    assert uso.custo_unitario == Decimal("4.60")
