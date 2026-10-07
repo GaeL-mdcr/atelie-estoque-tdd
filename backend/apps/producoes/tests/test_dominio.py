@@ -11,7 +11,12 @@ import pytest
 from apps.cadastros.dominio import Categoria, CategoriaIncompativelError
 from apps.comum.erros import ValorObrigatorioError
 from apps.estoque.dominio import EstoqueVariante, SaldoInsuficienteError
-from apps.producoes.dominio import Producao, RetornoExcedeUsoError, UsoNaoEncontradoError
+from apps.producoes.dominio import (
+    Producao,
+    RetornoExcedeUsoError,
+    UsoNaoEncontradoError,
+    VarianteDiferenteError,
+)
 
 SAIA = Categoria("Saia", "P")
 T1 = datetime(2026, 9, 18, 17, 15, tzinfo=timezone.utc)
@@ -117,3 +122,13 @@ def nao_deve_devolver_uso_inexistente_nem_retorno(saia, azul):
     with pytest.raises(UsoNaoEncontradoError):
         saia.registrar_retorno(retorno.id, azul, "0.1", T2)
     assert azul.saldo == Decimal("47.500")
+
+
+# Tecido que saiu do Azul não pode voltar para o estoque do Branco.
+def nao_deve_devolver_para_outra_cor(saia, azul):
+    uso = saia.registrar_uso(azul, "3", T1)
+    branco = EstoqueVariante("5", "3", variante_id=11)
+    with pytest.raises(VarianteDiferenteError):
+        saia.registrar_retorno(uso.id, branco, "1", T2)
+    assert azul.saldo == Decimal("47.000")
+    assert branco.saldo == Decimal("5.000")
