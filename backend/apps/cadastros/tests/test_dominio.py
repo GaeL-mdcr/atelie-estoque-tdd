@@ -13,6 +13,7 @@ from apps.cadastros.dominio import (
     CorInvalidaError,
     Material,
     VarianteDuplicadaError,
+    VarianteNaoEncontradaError,
 )
 from apps.comum.erros import ValorInvalidoError, ValorObrigatorioError
 
@@ -108,3 +109,10 @@ def deve_manter_estoque_separado_por_cor():
     oxford.estoque_da_cor(Cor("Branco")).registrar_entrada("10", "20")
     assert oxford.estoque_da_cor(Cor("Azul")).saldo == Decimal("10.000")
     assert oxford.estoque_da_cor(Cor("Branco")).saldo == Decimal("10.000")
+
+
+def nao_deve_achar_estoque_de_cor_nao_cadastrada():
+    oxford = Material("Tecido Oxford", TECIDO, METRO)
+    oxford.adicionar_cor(Cor("Azul"))
+    with pytest.raises(VarianteNaoEncontradaError):
+        oxford.estoque_da_cor(Cor("Verde"))
