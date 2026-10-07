@@ -32,6 +32,10 @@ class EstoqueVariante:
     def custo_medio(self):
         return self._custo_medio
 
+    @property
+    def qtd_estoque_minimo(self):
+        return self._qtd_estoque_minimo
+
     def abaixo_do_minimo(self):
         return self._saldo < self._qtd_estoque_minimo
 

@@ -7,6 +7,7 @@ import re
 from apps.comum.arquivavel import Arquivavel
 from apps.comum.erros import ErroDeNegocio, ValorInvalidoError
 from apps.comum.numeros import texto_obrigatorio
+from apps.estoque.dominio import EstoqueVariante
 
 FORMATO_HEX = re.compile(r"#[0-9A-Fa-f]{6}")
 
@@ -51,6 +52,12 @@ class Material(Arquivavel):
         self.categoria = categoria
         self.unidade_estoque_id = unidade_estoque_id
         self.descricao = descricao
+        self._variantes = []  # pares (cor, estoque), na ordem em que foram cadastrados
+
+    def adicionar_cor(self, cor, qtd_estoque_minimo="0", qtd_inicial="0", vl_unitario_inicial="0"):
+        estoque = EstoqueVariante(qtd_inicial, vl_unitario_inicial, qtd_estoque_minimo)
+        self._variantes.append((cor, estoque))
+        return estoque
 
     def cores(self):
-        return []
+        return [cor.nome for cor, _ in self._variantes]
