@@ -25,3 +25,10 @@ def deve_recalcular_media_ponderada_quando_entra_compra():
     estoque.registrar_entrada("40", "160")
     assert estoque.saldo == Decimal("50.000")
     assert estoque.custo_medio == Decimal("4.60")
+
+
+# Estoque zerado não pode dar divisão por zero: o custo médio vira o custo da compra.
+def deve_usar_o_custo_da_compra_quando_estoque_estava_vazio():
+    estoque = EstoqueVariante()
+    estoque.registrar_entrada("40", "160")
+    assert estoque.custo_medio == Decimal("4.00")
