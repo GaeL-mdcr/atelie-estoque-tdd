@@ -4,6 +4,9 @@ analyzer:
   exclude:
     # Código gerado pelo Drift não precisa passar pelo linter
     - "**/*.g.dart"
+    - build/**
+    - android/**
+    - web/**
 
 linter:
   rules:
