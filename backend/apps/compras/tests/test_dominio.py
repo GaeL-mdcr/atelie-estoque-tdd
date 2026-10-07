@@ -37,3 +37,9 @@ def deve_converter_a_entrada_quando_comprou_em_rolo():
     item = item_em_rolo("2", "80", ConversaoUnidade(TECIDO, ROLO, "1", "20"))
     assert item.qtd_entrada_estoque == Decimal("40.000")
     assert item.total() == Decimal("160.00")
+
+
+# R$ 160 ÷ 40 m = R$ 4,00 por metro que entrou.
+def deve_calcular_custo_por_metro_que_entrou():
+    item = item_em_rolo("2", "80", ConversaoUnidade(TECIDO, ROLO, "1", "20"))
+    assert item.custo_unitario_entrada() == Decimal("4.00")
