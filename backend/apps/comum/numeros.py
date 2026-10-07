@@ -5,9 +5,13 @@ Tudo é Decimal, nunca float. Um float como 0.1 vira 0.1000000000000000055...
 e esse resto aparece no custo médio depois de algumas compras.
 """
 
-from decimal import Decimal, InvalidOperation
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
 from apps.comum.erros import ValorInvalidoError
+
+CASAS_QUANTIDADE = Decimal("0.001")
+CASAS_DINHEIRO = Decimal("0.01")
+CASAS_FATOR = Decimal("0.000001")
 
 NAO_E_NUMERO = "Esse valor não é um número que o ateliê consiga usar."
 
@@ -24,3 +28,15 @@ def decimal_de(valor):
     if not numero.is_finite():
         raise ValorInvalidoError(NAO_E_NUMERO)
     return numero
+
+
+def quantidade(valor):
+    return decimal_de(valor).quantize(CASAS_QUANTIDADE, rounding=ROUND_HALF_UP)
+
+
+def dinheiro(valor):
+    return decimal_de(valor).quantize(CASAS_DINHEIRO, rounding=ROUND_HALF_UP)
+
+
+def fator(valor):
+    return decimal_de(valor).quantize(CASAS_FATOR, rounding=ROUND_HALF_UP)
