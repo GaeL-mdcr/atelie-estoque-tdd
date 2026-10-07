@@ -25,3 +25,7 @@ def item_em_rolo(qtd, preco, conversao):
 
 def deve_calcular_total_do_item():
     assert item_em_metro("3", "7.50").total() == Decimal("22.50")
+
+
+def deve_entrar_a_mesma_quantidade_quando_unidades_sao_iguais():
+    assert item_em_metro("3", "7.50").qtd_entrada_estoque == Decimal("3.000")
