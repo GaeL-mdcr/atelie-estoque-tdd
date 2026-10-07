@@ -116,3 +116,12 @@ def nao_deve_achar_estoque_de_cor_nao_cadastrada():
     oxford.adicionar_cor(Cor("Azul"))
     with pytest.raises(VarianteNaoEncontradaError):
         oxford.estoque_da_cor(Cor("Verde"))
+
+
+# Arquivar só tira das listas de escolha: as cores (e o histórico) continuam lá.
+def deve_arquivar_sem_perder_as_cores():
+    oxford = Material("Tecido Oxford", TECIDO, METRO)
+    oxford.adicionar_cor(Cor("Azul"))
+    oxford.arquivar()
+    assert oxford.ativo is False
+    assert oxford.cores() == ["Azul"]
