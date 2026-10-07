@@ -20,6 +20,10 @@ class RetornoExcedeUsoError(ErroDeNegocio):
     """Tentou devolver mais do que ainda pode voltar daquele uso."""
 
 
+class UsoNaoEncontradoError(ErroDeNegocio):
+    """O uso de origem não existe nesta produção (ou o id é de um retorno)."""
+
+
 @dataclass(frozen=True)
 class MovimentacaoMaterial:
     """Um uso (U) ou retorno (R) de material. Depois de criada, não muda mais."""
@@ -60,7 +64,7 @@ class Producao:
         return tuple(self._movimentacoes)
 
     def registrar_retorno(self, id_uso_origem, estoque, qtd, quando):
-        uso = next(m for m in self._movimentacoes if m.id == id_uso_origem)
+        uso = self._uso(id_uso_origem)
         qtd = quantidade(qtd)
         devolvivel = self.quantidade_devolvivel(uso.id)
         if qtd > devolvivel:
@@ -72,8 +76,14 @@ class Producao:
         return retorno
 
     def quantidade_devolvivel(self, id_uso):
-        uso = next(m for m in self._movimentacoes if m.id == id_uso)
+        uso = self._uso(id_uso)
         devolvido = sum(
             (m.quantidade for m in self._movimentacoes if m.id_uso_origem == id_uso), Decimal("0")
         )
         return quantidade(uso.quantidade - devolvido)
+
+    def _uso(self, id_uso):
+        for movimentacao in self._movimentacoes:
+            if movimentacao.id == id_uso and movimentacao.tipo == USO:
+                return movimentacao
+        raise UsoNaoEncontradoError("Esse uso de material não foi encontrado nesta produção.")
