@@ -218,3 +218,15 @@ def deve_tirar_da_vitrine_quando_reabrir(saia):
     saia.publicar_na_vitrine()
     saia.reabrir("Cliente pediu ajuste na barra", usuario_id=1, quando=T2)
     assert saia.publicada is False
+
+
+# A vitrine só vê o que a cliente pode ver: nada de custo, fornecedor ou estoque.
+# (As imagens entram na Fase 2, quando existir a tabela Imagem_Producao.)
+def deve_expor_so_os_dados_publicos(saia, azul):
+    saia.registrar_uso(azul, "3", T1)
+    assert saia.dados_publicos() == {
+        "nome_peca": "Saia midi",
+        "categoria": "Saia",
+        "descricao": "",
+        "vl_venda": Decimal("220.00"),
+    }
