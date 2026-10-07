@@ -1,0 +1,36 @@
+// Ambiente do Codespaces para o ateliê: Python para o backend e Flutter para o app.
+// Assim dá para rodar os testes na nuvem sem depender da máquina Windows.
+{
+  "name": "Ateliê Estoque TDD",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+  // O Flutter fica fora do repositório, na pasta do usuário do container.
+  "remoteEnv": {
+    "PATH": "${containerEnv:PATH}:/home/vscode/flutter/bin"
+  },
+  "postCreateCommand": "bash .devcontainer/pos-criacao.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "Dart-Code.dart-code",
+        "Dart-Code.flutter",
+        "EditorConfig.EditorConfig"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
+        "python.testing.pytestEnabled": true,
+        "python.testing.cwd": "${workspaceFolder}/backend",
+        "python.testing.pytestArgs": []
+      }
+    }
+  },
+  // 8000: Django (runserver) · 8080: app Flutter na web (flutter run -d web-server --web-port 8080)
+  "forwardPorts": [8000, 8080],
+  "portsAttributes": {
+    "8000": { "label": "Backend Django" },
+    "8080": { "label": "App Flutter (web)" }
+  }
+}
