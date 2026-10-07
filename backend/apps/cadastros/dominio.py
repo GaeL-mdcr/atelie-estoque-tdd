@@ -20,6 +20,10 @@ class CategoriaIncompativelError(ErroDeNegocio):
     """Categoria de produção usada num material, ou o contrário."""
 
 
+class VarianteDuplicadaError(ErroDeNegocio):
+    """A mesma cor cadastrada duas vezes no mesmo material."""
+
+
 class Cor(Arquivavel):
     def __init__(self, nome, codigo_hex=None):
         self.ativo = True
@@ -30,6 +34,10 @@ class Cor(Arquivavel):
 
     def rotulo(self):
         return self.nome
+
+    def chave(self):
+        # Usada para comparar: "Azul" e "azul" são a mesma cor.
+        return self.nome.lower()
 
 
 class Categoria:
@@ -55,6 +63,8 @@ class Material(Arquivavel):
         self._variantes = []  # pares (cor, estoque), na ordem em que foram cadastrados
 
     def adicionar_cor(self, cor, qtd_estoque_minimo="0", qtd_inicial="0", vl_unitario_inicial="0"):
+        if any(existente.chave() == cor.chave() for existente, _ in self._variantes):
+            raise VarianteDuplicadaError(f"A cor {cor.rotulo()} já está cadastrada neste material.")
         estoque = EstoqueVariante(qtd_inicial, vl_unitario_inicial, qtd_estoque_minimo)
         self._variantes.append((cor, estoque))
         return estoque
