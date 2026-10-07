@@ -43,3 +43,11 @@ def deve_converter_a_entrada_quando_comprou_em_rolo():
 def deve_calcular_custo_por_metro_que_entrou():
     item = item_em_rolo("2", "80", ConversaoUnidade(TECIDO, ROLO, "1", "20"))
     assert item.custo_unitario_entrada() == Decimal("4.00")
+
+
+# A quantidade que entrou é histórico: corrigir a conversão hoje não muda a compra de ontem.
+def nao_deve_mudar_a_entrada_quando_a_conversao_muda_depois():
+    rolo = ConversaoUnidade(TECIDO, ROLO, "1", "20")
+    item = item_em_rolo("2", "80", rolo)
+    rolo.alterar("1", "25")
+    assert item.qtd_entrada_estoque == Decimal("40.000")
