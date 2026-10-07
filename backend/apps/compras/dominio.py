@@ -67,3 +67,6 @@ class Compra:
 
     def remover_item(self, posicao):
         del self._itens[posicao]
+
+    def confirmar(self):
+        self.confirmada = True
