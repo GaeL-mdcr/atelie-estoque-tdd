@@ -18,6 +18,10 @@ class CompraSemItensError(ErroDeNegocio):
     """Tentou confirmar uma compra vazia."""
 
 
+class CompraConfirmadaError(ErroDeNegocio):
+    """Tentou mexer numa compra que já foi confirmada."""
+
+
 class ItemCompra:
     def __init__(self, variante_id, material_id, unidade_compra_id, unidade_estoque_id,
                  qtd_compra, vl_unitario_compra, conversao=None):
@@ -64,15 +68,23 @@ class Compra:
         return dinheiro(sum((item.total() for item in self._itens), 0))
 
     def adicionar_item(self, item):
+        if self.confirmada:
+            raise CompraConfirmadaError("Essa compra já foi confirmada e não pode mais ser alterada.")
         self._itens.append(item)
 
     def editar_item(self, posicao, item):
+        if self.confirmada:
+            raise CompraConfirmadaError("Essa compra já foi confirmada e não pode mais ser alterada.")
         self._itens[posicao] = item
 
     def remover_item(self, posicao):
+        if self.confirmada:
+            raise CompraConfirmadaError("Essa compra já foi confirmada e não pode mais ser alterada.")
         del self._itens[posicao]
 
     def confirmar(self):
+        if self.confirmada:
+            raise CompraConfirmadaError("Essa compra já foi confirmada e não pode mais ser alterada.")
         if not self._itens:
             raise CompraSemItensError("Adicione pelo menos um item antes de confirmar a compra.")
         self.confirmada = True
