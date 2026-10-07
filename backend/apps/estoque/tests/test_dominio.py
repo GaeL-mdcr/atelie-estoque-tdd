@@ -32,3 +32,11 @@ def deve_usar_o_custo_da_compra_quando_estoque_estava_vazio():
     estoque = EstoqueVariante()
     estoque.registrar_entrada("40", "160")
     assert estoque.custo_medio == Decimal("4.00")
+
+
+# A saída devolve o custo médio do momento, que fica gravado no uso. A média não muda.
+def deve_baixar_saldo_e_devolver_custo_vigente_na_saida():
+    estoque = EstoqueVariante("50", "4.60")
+    assert estoque.registrar_saida("3") == Decimal("4.60")
+    assert estoque.saldo == Decimal("47.000")
+    assert estoque.custo_medio == Decimal("4.60")
