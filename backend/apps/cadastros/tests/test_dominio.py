@@ -19,7 +19,8 @@ def deve_aceitar_cor_sem_hex():
     assert Cor("Branco").codigo_hex is None
 
 
-@pytest.mark.parametrize("codigo", ["azul", "#12345", "#GGGGGG", "315A81"])
+# "#315A81\n" pega uma pegadinha do Python: o $ da regex aceita uma quebra de linha no fim.
+@pytest.mark.parametrize("codigo", ["azul", "#12345", "#GGGGGG", "315A81", "#315A81\n"])
 def nao_deve_aceitar_hex_fora_do_formato(codigo):
     with pytest.raises(CorInvalidaError):
         Cor("Azul", codigo)
