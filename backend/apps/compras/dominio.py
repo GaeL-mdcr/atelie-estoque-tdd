@@ -41,3 +41,20 @@ class ItemCompra:
 
     def custo_unitario_entrada(self):
         return dinheiro(self.total() / self.qtd_entrada_estoque)
+
+
+class Compra:
+    def __init__(self, fornecedor_id, usuario_id, data, observacoes=""):
+        self.fornecedor_id = fornecedor_id
+        self.usuario_id = usuario_id
+        self.data = data
+        self.observacoes = observacoes
+        self.confirmada = False
+        self._itens = []
+
+    @property
+    def itens(self):
+        return tuple(self._itens)
+
+    def total(self):
+        return dinheiro(sum((item.total() for item in self._itens), 0))
