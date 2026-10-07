@@ -3,7 +3,7 @@ Testes da produção (a peça): uso e retorno de material, custos, conclusão,
 reabertura e vitrine. Os números são os da Saia midi da Referência SQL.
 """
 
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 
 import pytest
@@ -132,3 +132,16 @@ def nao_deve_devolver_para_outra_cor(saia, azul):
         saia.registrar_retorno(uso.id, branco, "1", T2)
     assert azul.saldo == Decimal("47.000")
     assert branco.saldo == Decimal("5.000")
+
+
+# ---------- Custos, conclusão, reabertura e vitrine ----------
+
+CONCLUSAO = date(2026, 10, 20)
+
+
+# Saia midi: usou 3 m e devolveu 0,5 m a R$ 4,60 → 2,5 × 4,60 = R$ 11,50; com R$ 60 de mão de obra, R$ 71,50.
+def deve_calcular_os_custos_da_saia_midi(saia, azul):
+    uso = saia.registrar_uso(azul, "3", T1)
+    saia.registrar_retorno(uso.id, azul, "0.5", T2)
+    assert saia.custo_materiais() == Decimal("11.50")
+    assert saia.custo_total() == Decimal("71.50")
