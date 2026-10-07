@@ -105,6 +105,14 @@ class Producao:
     def retirar_da_vitrine(self):
         self.publicada = False
 
+    def dados_publicos(self):
+        return {
+            "nome_peca": self.nome_peca,
+            "categoria": self.categoria.nome,
+            "descricao": self.descricao,
+            "vl_venda": self.vl_venda,
+        }
+
     def registrar_uso(self, estoque, qtd, quando):
         self._exigir_em_andamento()
         if estoque.variante_id is None:
