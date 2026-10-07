@@ -58,3 +58,6 @@ class Compra:
 
     def total(self):
         return dinheiro(sum((item.total() for item in self._itens), 0))
+
+    def adicionar_item(self, item):
+        self._itens.append(item)
