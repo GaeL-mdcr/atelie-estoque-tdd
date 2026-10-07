@@ -7,7 +7,7 @@ from decimal import Decimal
 
 import pytest
 
-from apps.compras.dominio import ConversaoAusenteError, ItemCompra
+from apps.compras.dominio import ConversaoAusenteError, ConversaoIncompativelError, ItemCompra
 from apps.conversoes.dominio import ConversaoUnidade
 
 AZUL = 10  # variante Tecido Oxford Azul
@@ -58,3 +58,13 @@ def nao_deve_mudar_a_entrada_quando_a_conversao_muda_depois():
 def nao_deve_aceitar_unidade_diferente_sem_conversao():
     with pytest.raises(ConversaoAusenteError):
         item_em_rolo("2", "80", None)
+
+
+# Conversão do rolo de outro material, ou do pacote do tecido, não serve para o rolo do tecido.
+@pytest.mark.parametrize("conversao", [
+    ConversaoUnidade(9, ROLO, "1", "20"),
+    ConversaoUnidade(TECIDO, 3, "1", "20"),
+])
+def nao_deve_aceitar_conversao_que_nao_e_deste_material_e_unidade(conversao):
+    with pytest.raises(ConversaoIncompativelError):
+        item_em_rolo("2", "80", conversao)
