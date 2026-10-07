@@ -7,6 +7,7 @@ from decimal import Decimal
 
 import pytest
 
+from apps.comum.erros import QuantidadeInvalidaError, ValorInvalidoError
 from apps.estoque.dominio import EstoqueVariante, SaldoInsuficienteError
 
 
@@ -78,3 +79,18 @@ def deve_devolver_ao_saldo_e_recalcular_media_no_retorno():
 def deve_avisar_quando_abaixo_do_minimo():
     assert EstoqueVariante("4", "1", "5").abaixo_do_minimo() is True
     assert EstoqueVariante("5", "1", "5").abaixo_do_minimo() is False
+
+
+def nao_deve_aceitar_quantidade_ou_valor_invalido():
+    estoque = EstoqueVariante("10", "5")
+    with pytest.raises(QuantidadeInvalidaError):
+        estoque.registrar_entrada("0", "1")
+    with pytest.raises(QuantidadeInvalidaError):
+        estoque.registrar_saida("-1")
+    with pytest.raises(QuantidadeInvalidaError):
+        estoque.registrar_retorno("0", "1")
+    with pytest.raises(ValorInvalidoError):
+        estoque.registrar_entrada("1", "-5")
+    with pytest.raises(ValorInvalidoError):
+        EstoqueVariante("-1")
+    assert (estoque.saldo, estoque.custo_medio) == (Decimal("10.000"), Decimal("5.00"))
