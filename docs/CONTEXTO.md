@@ -64,7 +64,8 @@ Origem: **Doc** = já estava nos documentos; **07/10** = fechada na conversa de 
 | D10 | Banco do servidor: **SQLite no MVP**; código sem depender de `select_for_update` (usar `UPDATE … WHERE saldo >= qtd` com `F()`). PostgreSQL continua alternativa. | Doc |
 | D11 | Dinheiro e quantidade sempre em **`Decimal`**: qtd 3 casas, dinheiro 2, fator 6, `ROUND_HALF_UP`. | Doc |
 | D12 | Usuário do sistema será um **modelo de usuário próprio** (`apps.contas`) criado **antes da primeira migration**. | 07/10 (consequência de D09) |
-| D13 | Commits e comentários **em português, simples e humanizados**, com prefixo `[RED]`, `[GREEN]` ou `[REFACTOR]` nos ciclos. | 07/10 |
+| D13 | Commits e comentários **em português, simples e humanizados**, com prefixo `[RED]`, `[GREEN]` ou `[REFACTOR]` nos ciclos. Autor sempre o Gabriel; **sem** linha `Co-Authored-By` ou de sessão (o histórico foi regravado em 07/10 para tirar essas linhas). | 07/10 |
+| D15 | Reabrir uma produção publicada **tira da vitrine** automaticamente (peça em andamento não está concluída). | 07/10 |
 | D14 | Repositório público `atelie-estoque-tdd`; integrante: Gabriel (dupla a definir). | 07/10 |
 
 ## 4. Estado atual
@@ -130,6 +131,11 @@ flutter pub get && flutter test --coverage
 Cada linha = um ou mais ciclos Red → Green (→ Refactor), cada um com seu commit.
 Detalhes de assinatura e erros em [`requisitos.md`](requisitos.md).
 
+Planos:
+- Roteiro de todas as fases: [`superpowers/plans/2026-10-07-roteiro-ponta-a-ponta.md`](superpowers/plans/2026-10-07-roteiro-ponta-a-ponta.md)
+- Passo a passo da Fase 1 (domínio): [`superpowers/plans/2026-10-07-fase1-dominio-backend.md`](superpowers/plans/2026-10-07-fase1-dominio-backend.md)
+- Execução no ambiente de nuvem: só a Fase 1 roda lá (pytest 9 isolado em `/root/.local/bin/pytest`, sem Django).
+
 **Backend — domínio (Python puro)**
 
 - [ ] `ConversaoUnidade`: fator · converter · atende · equivalência ≤ 0 · converter ≤ 0
@@ -184,3 +190,5 @@ produção antes do teste custa 3 pontos.
 | Data | O que foi feito | Próximo passo |
 |---|---|---|
 | 07/10/2026 | Leitura dos documentos (Drive + Figma); decisões D01–D14 fechadas; repositório criado; estrutura vazia + README (commit 1); requisitos e este diário (commit 2). | Rodar `pytest` localmente; começar `ConversaoUnidade` com o primeiro `[RED]`. |
+| 07/10/2026 | Roteiro ponta a ponta (8 fases) e plano detalhado da Fase 1 (10 tarefas, 71 ciclos). Requisitos ajustados: `registrar_uso(estoque, qtd, quando)`, `alterar`, `estoque_da_cor`, `chave`, `VarianteDiferenteError`, reabrir tira da vitrine (confirmado, D15). | Gabriel revisar o plano e escolher como executar. |
+| 07/10/2026 | Histórico regravado sem a linha de coautoria do Claude (autor continua o Gabriel). D15 confirmada. | Executar a Fase 1. |

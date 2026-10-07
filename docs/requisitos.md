@@ -51,6 +51,8 @@ Objetos de apoio (sem regra própria relevante): `Categoria` (nome + tipo M/P),
 |---|---|
 | `Cor(nome: str, codigo_hex: str \| None = None)` | Guarda o nome sem espaços nas pontas. Hex é opcional; se vier, precisa ser `#RRGGBB`. |
 | `cor.rotulo() -> str` | Devolve o nome para exibir ao lado da amostra (a cor nunca é mostrada só pela bolinha). |
+| `cor.chave() -> str` | Nome em minúsculas, para comparar: "Azul" e " azul " são a mesma cor. |
+| `cor.arquivar()` / `cor.reativar()` | Liga/desliga `ativo`, como no material. |
 
 ### 4.2 `Material`
 
@@ -59,6 +61,7 @@ Objetos de apoio (sem regra própria relevante): `Categoria` (nome + tipo M/P),
 | `Material(nome: str, categoria: Categoria, unidade_estoque_id: int)` | Cria o material ativo. A categoria precisa ser do tipo **M**. |
 | `material.adicionar_cor(cor: Cor, qtd_estoque_minimo=0, qtd_inicial=0, vl_unitario_inicial=0) -> EstoqueVariante` | Cria a variante daquela cor com saldo inicial, mínimo e custo inicial. |
 | `material.cores() -> list[str]` | Nomes das cores já cadastradas para o material. |
+| `material.estoque_da_cor(cor: Cor) -> EstoqueVariante` | Estoque daquela cor; mexer nele não afeta as outras cores. |
 | `material.arquivar()` / `material.reativar()` | Liga/desliga `ativo`. Arquivado some das listas de escolha, mas o histórico continua. |
 
 ### 4.3 `ConversaoUnidade`
@@ -69,6 +72,7 @@ Objetos de apoio (sem regra própria relevante): `Categoria` (nome + tipo M/P),
 | `conversao.fator() -> Decimal` | `qtd_equivalente_estoque ÷ qtd_equivalente_compra`, 6 casas. |
 | `conversao.converter(qtd_compra) -> Decimal` | `qtd_compra × fator`, 3 casas. 2 rolos → 100 m. |
 | `conversao.atende(material_id, unidade_compra_id) -> bool` | Só vale para o mesmo material e a mesma unidade de compra. |
+| `conversao.alterar(qtd_equivalente_compra, qtd_equivalente_estoque)` | Corrige a equivalência com a mesma validação. Compras antigas não mudam. |
 
 ### 4.4 `ItemCompra`
 
@@ -77,7 +81,7 @@ Objetos de apoio (sem regra própria relevante): `Categoria` (nome + tipo M/P),
 | `ItemCompra(variante_id, material_id, unidade_compra_id, unidade_estoque_id, qtd_compra, vl_unitario_compra, conversao=None)` | Unidades iguais → entra a mesma quantidade. Unidades diferentes → exige conversão compatível. |
 | `item.qtd_entrada_estoque` | Calculada **uma vez** na criação e guardada; mudar a conversão depois não altera o item. |
 | `item.total() -> Decimal` | `qtd_compra × vl_unitario_compra`, 2 casas. |
-| `item.custo_unitario_entrada() -> Decimal` | `total ÷ qtd_entrada_estoque`, 2 casas. Ex.: 2 rolos × R$ 80 = R$ 160 ÷ 100 m = R$ 1,60/m. |
+| `item.custo_unitario_entrada() -> Decimal` | `total ÷ qtd_entrada_estoque`, 2 casas. Ex.: 2 rolos × R$ 80 = R$ 160 ÷ 40 m (1 rolo = 20 m) = R$ 4,00/m. |
 
 ### 4.5 `Compra`
 
@@ -94,7 +98,7 @@ Objetos de apoio (sem regra própria relevante): `Categoria` (nome + tipo M/P),
 
 | Assinatura | Comportamento esperado |
 |---|---|
-| `EstoqueVariante(qtd_inicial=0, vl_unitario_inicial=0, qtd_estoque_minimo=0)` | Saldo começa no inicial e o custo médio no valor inicial. |
+| `EstoqueVariante(qtd_inicial=0, vl_unitario_inicial=0, qtd_estoque_minimo=0, *, variante_id=None)` | Saldo começa no inicial e o custo médio no valor inicial. `variante_id` identifica a combinação material + cor. |
 | `estoque.saldo` / `estoque.custo_medio` | Somente leitura: não existe "editar saldo". |
 | `estoque.registrar_entrada(qtd, custo_total)` | Soma no saldo e recalcula a média ponderada: `(saldo×média + custo_total) ÷ (saldo + qtd)`. |
 | `estoque.registrar_saida(qtd) -> Decimal` | Tira do saldo e devolve o custo médio vigente (que fica gravado no uso). Média não muda. |
@@ -106,19 +110,21 @@ Objetos de apoio (sem regra própria relevante): `Categoria` (nome + tipo M/P),
 | Assinatura | Comportamento esperado |
 |---|---|
 | `Producao(nome_peca, categoria: Categoria, usuario_id, vl_mao_obra=0, vl_venda=0, pasta_id=None)` | Pasta é opcional. Categoria precisa ser do tipo **P**. |
-| `producao.registrar_uso(variante_id, estoque, qtd, quando) -> MovimentacaoMaterial` | Cria um **U** com o custo médio vigente da cor; o estoque daquela cor diminui. |
+| `producao.registrar_uso(estoque, qtd, quando) -> MovimentacaoMaterial` | Cria um **U** com o custo médio vigente da cor (a cor vem de `estoque.variante_id`); o estoque daquela cor diminui. |
 | `producao.quantidade_devolvivel(id_uso) -> Decimal` | `quantidade usada − retornos já feitos daquele uso`. |
-| `producao.registrar_retorno(id_uso_origem, estoque, qtd, quando) -> MovimentacaoMaterial` | Cria um **R** apontando para o uso de origem, com o custo daquele uso. O uso original não é apagado. |
+| `producao.registrar_retorno(id_uso_origem, estoque, qtd, quando) -> MovimentacaoMaterial` | Cria um **R** apontando para o uso de origem, com o custo daquele uso. O uso original não é apagado. O estoque tem que ser da mesma cor do uso. |
+| `producao.movimentacoes() -> tuple` | Usos e retornos na ordem em que aconteceram. |
 | `producao.custo_materiais() -> Decimal` | `Σ (qtd × custo) dos U − Σ (qtd × custo) dos R`. |
 | `producao.custo_total() -> Decimal` | `custo_materiais + mão de obra`. |
 | `producao.concluir(data)` | Marca a data de finalização. Daí em diante usos e retornos ficam bloqueados. |
-| `producao.reabrir(motivo, usuario_id, quando) -> EventoReabertura` | Volta a ficar em andamento e registra **quem, quando e por quê** no histórico. |
+| `producao.reabrir(motivo, usuario_id, quando) -> EventoReabertura` | Volta a ficar em andamento, sai da vitrine se estava publicada e registra **quem, quando e por quê** no histórico. |
 | `producao.historico_reaberturas() -> list[EventoReabertura]` | Lista as reaberturas em ordem. |
 | `producao.publicar_na_vitrine()` / `producao.retirar_da_vitrine()` | Publicação manual, só de peça concluída. |
 | `producao.dados_publicos() -> dict` | Só nome, categoria, descrição, valor de venda e imagens — nada de custo, fornecedor ou estoque. |
 
-**Total: 7 classes e 33 métodos/propriedades testáveis**, fora os 7 construtores, que também
-validam dados (mínimo exigido: 4 classes e 15 métodos).
+**Total: 7 classes e 39 métodos/propriedades testáveis**, fora os 7 construtores, que também
+validam dados (mínimo exigido: 4 classes e 15 métodos). O passo a passo dos testes está no
+plano da Fase 1: [`superpowers/plans/2026-10-07-fase1-dominio-backend.md`](superpowers/plans/2026-10-07-fase1-dominio-backend.md).
 
 ## 5. Regras de negócio que os testes vão validar
 
@@ -140,7 +146,7 @@ validam dados (mínimo exigido: 4 classes e 15 métodos).
 | RN-T14 | Custo de materiais = usos − retornos; custo total = materiais + mão de obra. | Producao | RN15 |
 | RN-T15 | Produção concluída não aceita uso nem retorno. | Producao | RF30 |
 | RN-T16 | Reabertura exige motivo e fica registrada com usuário e data. | Producao | RF30 (fechada em 07/10) |
-| RN-T17 | Só produção concluída pode ser publicada; a vitrine só recebe dados públicos. | Producao | RN18, RF31, RF35 |
+| RN-T17 | Só produção concluída pode ser publicada; reabrir tira da vitrine; a vitrine só recebe dados públicos. | Producao | RN18, RF31, RF35 |
 | RN-T18 | Material arquivado continua com histórico, só sai das listas de escolha. | Material | RN19 (fechada em 07/10) |
 
 ## 6. Cenários de exceção (pelo menos um por classe)
@@ -153,6 +159,7 @@ Os erros são exceções próprias, com mensagem em português que a tela pode m
 | Cor | Nome vazio | `ValorObrigatorioError` |
 | Material | Mesma cor adicionada duas vezes | `VarianteDuplicadaError` |
 | Material | Categoria do tipo P | `CategoriaIncompativelError` |
+| Material | Pedir o estoque de uma cor que o material não tem | `VarianteNaoEncontradaError` |
 | ConversaoUnidade | Equivalência zero ou negativa | `QuantidadeInvalidaError` |
 | ConversaoUnidade | Converter quantidade zero ou negativa | `QuantidadeInvalidaError` |
 | ItemCompra | Unidades diferentes sem conversão | `ConversaoAusenteError` |
@@ -164,7 +171,8 @@ Os erros são exceções próprias, com mensagem em português que a tela pode m
 | EstoqueVariante | Saída maior que o saldo (mensagem traz o disponível) | `SaldoInsuficienteError` |
 | EstoqueVariante | Entrada/saída/retorno com quantidade ≤ 0 | `QuantidadeInvalidaError` |
 | Producao | Retorno maior que o devolvível daquele uso | `RetornoExcedeUsoError` |
-| Producao | Retorno de um uso que não existe nessa produção | `UsoNaoEncontradoError` |
+| Producao | Retorno de um uso que não existe nessa produção (ou de outro retorno) | `UsoNaoEncontradoError` |
+| Producao | Retorno indo para o estoque de outra cor | `VarianteDiferenteError` |
 | Producao | Uso ou retorno com a produção concluída | `ProducaoConcluidaError` |
 | Producao | Reabrir sem motivo | `ValorObrigatorioError` |
 | Producao | Reabrir produção que não está concluída | `ProducaoNaoConcluidaError` |
