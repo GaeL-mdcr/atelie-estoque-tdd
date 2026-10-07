@@ -65,6 +65,8 @@ class Producao:
         return self.dt_finalizacao is not None
 
     def concluir(self, data):
+        if self.concluida:
+            raise ProducaoConcluidaError("Essa peça já foi concluída. Reabra a produção para mexer no material.")
         self.dt_finalizacao = data
 
     def registrar_uso(self, estoque, qtd, quando):
