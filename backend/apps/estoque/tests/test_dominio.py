@@ -56,3 +56,19 @@ def deve_permitir_sair_todo_o_saldo():
     estoque = EstoqueVariante("2", "5")
     estoque.registrar_saida("2")
     assert estoque.saldo == Decimal("0.000")
+
+
+# O retorno volta com o custo do uso de origem e entra na média ponderada (decisão D05).
+def deve_devolver_ao_saldo_e_recalcular_media_no_retorno():
+    estoque = EstoqueVariante("47", "4.60")
+    estoque.registrar_retorno("0.5", "4.60")
+    assert estoque.saldo == Decimal("47.500")
+    assert estoque.custo_medio == Decimal("4.60")
+
+    outro = EstoqueVariante("10", "5")
+    outro.registrar_retorno("10", "7")
+    assert outro.custo_medio == Decimal("6.00")
+
+    vazio = EstoqueVariante()
+    vazio.registrar_retorno("1", "4.60")
+    assert (vazio.saldo, vazio.custo_medio) == (Decimal("1.000"), Decimal("4.60"))
