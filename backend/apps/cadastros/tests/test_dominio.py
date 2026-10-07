@@ -12,6 +12,7 @@ from apps.cadastros.dominio import (
     Cor,
     CorInvalidaError,
     Material,
+    VarianteDuplicadaError,
 )
 from apps.comum.erros import ValorInvalidoError, ValorObrigatorioError
 
@@ -87,4 +88,13 @@ def deve_adicionar_cor_com_estoque_proprio():
     assert azul.saldo == Decimal("10.000")
     assert azul.custo_medio == Decimal("7.00")
     assert azul.qtd_estoque_minimo == Decimal("5.000")
+    assert oxford.cores() == ["Azul"]
+
+
+# "Azul" e " azul " são a mesma cor para a dona do ateliê, então a segunda é recusada.
+def nao_deve_repetir_a_mesma_cor_no_material():
+    oxford = Material("Tecido Oxford", TECIDO, METRO)
+    oxford.adicionar_cor(Cor("Azul"))
+    with pytest.raises(VarianteDuplicadaError):
+        oxford.adicionar_cor(Cor(" azul "))
     assert oxford.cores() == ["Azul"]
