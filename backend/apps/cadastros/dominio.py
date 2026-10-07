@@ -15,6 +15,10 @@ class CorInvalidaError(ErroDeNegocio):
     """Código da cor fora do formato #RRGGBB."""
 
 
+class CategoriaIncompativelError(ErroDeNegocio):
+    """Categoria de produção usada num material, ou o contrário."""
+
+
 class Cor(Arquivavel):
     def __init__(self, nome, codigo_hex=None):
         self.ativo = True
@@ -42,6 +46,8 @@ class Material(Arquivavel):
     def __init__(self, nome, categoria, unidade_estoque_id, descricao=""):
         self.ativo = True
         self.nome = nome
+        if categoria.tipo != Categoria.MATERIAL:
+            raise CategoriaIncompativelError("Escolha uma categoria de material, como Tecido ou Linha.")
         self.categoria = categoria
         self.unidade_estoque_id = unidade_estoque_id
         self.descricao = descricao
