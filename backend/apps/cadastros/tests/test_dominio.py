@@ -4,7 +4,13 @@ Testes dos cadastros: cor, categoria e material.
 
 import pytest
 
-from apps.cadastros.dominio import Categoria, Cor, CorInvalidaError, Material
+from apps.cadastros.dominio import (
+    Categoria,
+    CategoriaIncompativelError,
+    Cor,
+    CorInvalidaError,
+    Material,
+)
 from apps.comum.erros import ValorInvalidoError, ValorObrigatorioError
 
 
@@ -65,3 +71,8 @@ def deve_criar_material_ativo_com_categoria_de_material():
     assert oxford.nome == "Tecido Oxford"
     assert oxford.ativo is True
     assert oxford.cores() == []
+
+
+def nao_deve_aceitar_categoria_de_producao():
+    with pytest.raises(CategoriaIncompativelError):
+        Material("Tecido Oxford", SAIA, METRO)
