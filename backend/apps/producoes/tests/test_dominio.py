@@ -10,7 +10,7 @@ import pytest
 
 from apps.cadastros.dominio import Categoria, CategoriaIncompativelError
 from apps.comum.erros import ValorObrigatorioError
-from apps.estoque.dominio import EstoqueVariante
+from apps.estoque.dominio import EstoqueVariante, SaldoInsuficienteError
 from apps.producoes.dominio import Producao
 
 SAIA = Categoria("Saia", "P")
@@ -56,3 +56,10 @@ def deve_manter_o_custo_do_uso_quando_chega_compra_nova(saia, azul):
     uso = saia.registrar_uso(azul, "3", T1)
     azul.registrar_entrada("10", "100")
     assert uso.custo_unitario == Decimal("4.60")
+
+
+def nao_deve_usar_mais_que_o_saldo(saia):
+    pouco = EstoqueVariante("2", "5", variante_id=10)
+    with pytest.raises(SaldoInsuficienteError):
+        saia.registrar_uso(pouco, "2.5", T1)
+    assert saia.movimentacoes() == ()
