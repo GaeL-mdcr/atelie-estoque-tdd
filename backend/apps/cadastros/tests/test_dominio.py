@@ -98,3 +98,13 @@ def nao_deve_repetir_a_mesma_cor_no_material():
     with pytest.raises(VarianteDuplicadaError):
         oxford.adicionar_cor(Cor(" azul "))
     assert oxford.cores() == ["Azul"]
+
+
+# Comprar Branco não pode mexer no saldo do Azul (RN-T10).
+def deve_manter_estoque_separado_por_cor():
+    oxford = Material("Tecido Oxford", TECIDO, METRO)
+    oxford.adicionar_cor(Cor("Azul"), qtd_inicial="10", vl_unitario_inicial="7")
+    oxford.adicionar_cor(Cor("Branco"))
+    oxford.estoque_da_cor(Cor("Branco")).registrar_entrada("10", "20")
+    assert oxford.estoque_da_cor(Cor("Azul")).saldo == Decimal("10.000")
+    assert oxford.estoque_da_cor(Cor("Branco")).saldo == Decimal("10.000")
