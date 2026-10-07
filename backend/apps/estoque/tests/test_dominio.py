@@ -49,3 +49,10 @@ def nao_deve_sair_mais_que_o_saldo():
         estoque.registrar_saida("2.5")
     assert erro.value.disponivel == Decimal("2.000")
     assert estoque.saldo == Decimal("2.000")
+
+
+# Usar exatamente o que tem pode: o saldo vai a zero, não fica negativo.
+def deve_permitir_sair_todo_o_saldo():
+    estoque = EstoqueVariante("2", "5")
+    estoque.registrar_saida("2")
+    assert estoque.saldo == Decimal("0.000")
