@@ -5,6 +5,7 @@ Cadastros do ateliê: cor, categoria e material.
 import re
 
 from apps.comum.erros import ErroDeNegocio
+from apps.comum.numeros import texto_obrigatorio
 
 FORMATO_HEX = re.compile(r"#[0-9A-Fa-f]{6}")
 
@@ -15,10 +16,16 @@ class CorInvalidaError(ErroDeNegocio):
 
 class Cor:
     def __init__(self, nome, codigo_hex=None):
-        self.nome = nome.strip()
+        self.nome = texto_obrigatorio(nome, "nome da cor")
         if codigo_hex is not None and not FORMATO_HEX.fullmatch(codigo_hex):
             raise CorInvalidaError("O código da cor precisa ser no formato #RRGGBB, por exemplo #315A81.")
         self.codigo_hex = codigo_hex.upper() if codigo_hex is not None else None
 
     def rotulo(self):
         return self.nome
+
+
+class Categoria:
+    def __init__(self, nome, tipo):
+        self.nome = texto_obrigatorio(nome, "nome da categoria")
+        self.tipo = tipo
