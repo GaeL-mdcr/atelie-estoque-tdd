@@ -72,27 +72,30 @@ class Compra:
         return dinheiro(sum((item.total() for item in self._itens), 0))
 
     def adicionar_item(self, item):
-        if self.confirmada:
-            raise CompraConfirmadaError("Essa compra já foi confirmada e não pode mais ser alterada.")
+        self._exigir_rascunho()
         self._itens.append(item)
 
     def editar_item(self, posicao, item):
-        if self.confirmada:
-            raise CompraConfirmadaError("Essa compra já foi confirmada e não pode mais ser alterada.")
-        if not 0 <= posicao < len(self._itens):
-            raise ItemNaoEncontradoError("Esse item não está na compra.")
+        self._exigir_rascunho()
+        self._exigir_posicao(posicao)
         self._itens[posicao] = item
 
     def remover_item(self, posicao):
-        if self.confirmada:
-            raise CompraConfirmadaError("Essa compra já foi confirmada e não pode mais ser alterada.")
-        if not 0 <= posicao < len(self._itens):
-            raise ItemNaoEncontradoError("Esse item não está na compra.")
+        self._exigir_rascunho()
+        self._exigir_posicao(posicao)
         del self._itens[posicao]
 
     def confirmar(self):
-        if self.confirmada:
-            raise CompraConfirmadaError("Essa compra já foi confirmada e não pode mais ser alterada.")
+        self._exigir_rascunho()
         if not self._itens:
             raise CompraSemItensError("Adicione pelo menos um item antes de confirmar a compra.")
         self.confirmada = True
+
+    def _exigir_rascunho(self):
+        if self.confirmada:
+            raise CompraConfirmadaError("Essa compra já foi confirmada e não pode mais ser alterada.")
+
+    def _exigir_posicao(self, posicao):
+        # Sem isso, posição -1 mexeria no último item, porque é assim que lista funciona no Python.
+        if not 0 <= posicao < len(self._itens):
+            raise ItemNaoEncontradoError("Esse item não está na compra.")
