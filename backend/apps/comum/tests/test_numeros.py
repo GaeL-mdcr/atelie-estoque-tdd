@@ -9,8 +9,21 @@ from decimal import Decimal
 
 import pytest
 
-from apps.comum.erros import ValorInvalidoError
-from apps.comum.numeros import decimal_de, dinheiro, fator, quantidade
+from apps.comum.erros import (
+    ErroDeNegocio,
+    QuantidadeInvalidaError,
+    ValorInvalidoError,
+    ValorObrigatorioError,
+)
+from apps.comum.numeros import (
+    decimal_de,
+    dinheiro,
+    exigir_nao_negativo,
+    exigir_positivo,
+    fator,
+    quantidade,
+    texto_obrigatorio,
+)
 
 
 def deve_converter_texto_e_inteiro_para_decimal():
@@ -40,3 +53,17 @@ def deve_arredondar_meio_para_cima_em_cada_escala():
     assert dinheiro("2") == Decimal("2.00")
     assert quantidade("1.2345") == Decimal("1.235")
     assert fator("0.3333335") == Decimal("0.333334")
+
+
+# A mensagem cita o campo, para a tela dizer exatamente o que está errado.
+def deve_validar_positivo_nao_negativo_e_texto():
+    assert exigir_positivo("0.001", "quantidade") == Decimal("0.001")
+    assert exigir_nao_negativo("0", "preço") == Decimal("0")
+    assert texto_obrigatorio("  Azul ", "nome") == "Azul"
+    with pytest.raises(QuantidadeInvalidaError, match="quantidade"):
+        exigir_positivo("0", "quantidade")
+    with pytest.raises(ValorInvalidoError, match="preço"):
+        exigir_nao_negativo("-0.01", "preço")
+    with pytest.raises(ValorObrigatorioError, match="nome"):
+        texto_obrigatorio("   ", "nome")
+    assert issubclass(QuantidadeInvalidaError, ErroDeNegocio)
