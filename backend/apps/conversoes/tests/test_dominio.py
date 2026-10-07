@@ -5,6 +5,9 @@ pacote) na unidade em que o material fica no estoque (metro, unidade).
 
 from decimal import Decimal
 
+import pytest
+
+from apps.comum.erros import QuantidadeInvalidaError
 from apps.conversoes.dominio import ConversaoUnidade
 
 TECIDO = 1
@@ -33,3 +36,10 @@ def deve_atender_somente_o_mesmo_material_e_a_mesma_unidade():
     assert rolo.atende(TECIDO, ROLO) is True
     assert rolo.atende(TECIDO, 3) is False
     assert rolo.atende(9, ROLO) is False
+
+
+# Fator com zero embaixo não existe, e "0 rolo = 50 m" não faz sentido.
+@pytest.mark.parametrize("compra,estoque", [("0", "50"), ("1", "0"), ("-1", "50")])
+def nao_deve_aceitar_equivalencia_zero_ou_negativa(compra, estoque):
+    with pytest.raises(QuantidadeInvalidaError):
+        ConversaoUnidade(TECIDO, ROLO, compra, estoque)
