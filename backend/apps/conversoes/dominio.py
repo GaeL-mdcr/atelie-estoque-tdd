@@ -23,3 +23,9 @@ class ConversaoUnidade:
 
     def atende(self, material_id, unidade_compra_id):
         return self.material_id == material_id and self.unidade_compra_id == unidade_compra_id
+
+    def alterar(self, qtd_equivalente_compra, qtd_equivalente_estoque):
+        compra = exigir_positivo(qtd_equivalente_compra, "quantidade na unidade de compra")
+        estoque = exigir_positivo(qtd_equivalente_estoque, "quantidade na unidade de estoque")
+        self.qtd_equivalente_compra = compra
+        self.qtd_equivalente_estoque = estoque
