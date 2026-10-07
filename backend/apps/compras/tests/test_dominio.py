@@ -120,3 +120,8 @@ def deve_remover_item_e_ajustar_o_total(compra):
     com_dois_itens(compra)
     compra.remover_item(1)
     assert compra.total() == Decimal("160.00")
+
+
+def deve_confirmar_compra_com_itens(compra):
+    com_dois_itens(compra).confirmar()
+    assert compra.confirmada is True
