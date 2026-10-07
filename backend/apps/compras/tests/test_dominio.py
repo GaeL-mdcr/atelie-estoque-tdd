@@ -95,8 +95,22 @@ def deve_comecar_como_rascunho_sem_itens(compra):
     assert compra.total() == Decimal("0.00")
 
 
-def deve_somar_os_totais_dos_itens(compra):
+def com_dois_itens(compra):
+    """R$ 160,00 (2 rolos) + R$ 22,50 (3 m)."""
     compra.adicionar_item(item_em_rolo("2", "80", ConversaoUnidade(TECIDO, ROLO, "1", "20")))
     compra.adicionar_item(item_em_metro("3", "7.50"))
+    return compra
+
+
+def deve_somar_os_totais_dos_itens(compra):
+    com_dois_itens(compra)
     assert len(compra.itens) == 2
     assert compra.total() == Decimal("182.50")
+
+
+def deve_editar_o_item_na_posicao(compra):
+    com_dois_itens(compra)
+    novo = item_em_metro("1", "10")
+    compra.editar_item(0, novo)
+    assert compra.itens[0] is novo
+    assert compra.total() == Decimal("32.50")
