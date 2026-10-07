@@ -11,7 +11,7 @@ import pytest
 from apps.cadastros.dominio import Categoria, CategoriaIncompativelError
 from apps.comum.erros import ValorObrigatorioError
 from apps.estoque.dominio import EstoqueVariante, SaldoInsuficienteError
-from apps.producoes.dominio import Producao, RetornoExcedeUsoError
+from apps.producoes.dominio import Producao, RetornoExcedeUsoError, UsoNaoEncontradoError
 
 SAIA = Categoria("Saia", "P")
 T1 = datetime(2026, 9, 18, 17, 15, tzinfo=timezone.utc)
@@ -106,3 +106,14 @@ def deve_devolver_com_o_custo_do_uso_de_origem(saia):
     assert retorno.custo_unitario == Decimal("4.00")
     assert azul.saldo == Decimal("17.000")
     assert azul.custo_medio == Decimal("7.13")        # (16 × 7,33 + 1 × 4,00) ÷ 17
+
+
+# Só dá para devolver de um uso desta produção; um retorno não serve de origem.
+def nao_deve_devolver_uso_inexistente_nem_retorno(saia, azul):
+    uso = saia.registrar_uso(azul, "3", T1)
+    retorno = saia.registrar_retorno(uso.id, azul, "0.5", T2)
+    with pytest.raises(UsoNaoEncontradoError):
+        saia.registrar_retorno("nao-existe", azul, "0.5", T2)
+    with pytest.raises(UsoNaoEncontradoError):
+        saia.registrar_retorno(retorno.id, azul, "0.1", T2)
+    assert azul.saldo == Decimal("47.500")
