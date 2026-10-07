@@ -7,7 +7,7 @@ from decimal import Decimal
 
 import pytest
 
-from apps.estoque.dominio import EstoqueVariante
+from apps.estoque.dominio import EstoqueVariante, SaldoInsuficienteError
 
 
 # Saldo não se edita à mão: ele só muda por compra, uso e retorno.
@@ -40,3 +40,12 @@ def deve_baixar_saldo_e_devolver_custo_vigente_na_saida():
     assert estoque.registrar_saida("3") == Decimal("4.60")
     assert estoque.saldo == Decimal("47.000")
     assert estoque.custo_medio == Decimal("4.60")
+
+
+# O erro diz quanto tem, para a tela mostrar "Disponível: 2" e a dona corrigir o número.
+def nao_deve_sair_mais_que_o_saldo():
+    estoque = EstoqueVariante("2", "5")
+    with pytest.raises(SaldoInsuficienteError) as erro:
+        estoque.registrar_saida("2.5")
+    assert erro.value.disponivel == Decimal("2.000")
+    assert estoque.saldo == Decimal("2.000")
