@@ -26,3 +26,10 @@ def deve_converter_quantidade_comprada_para_unidade_de_estoque():
     assert rolo.converter("1.5") == Decimal("75.000")
     # 3 × 0,333333 = 0,999999, que arredondado para 3 casas dá 1,000.
     assert ConversaoUnidade(TECIDO, ROLO, "3", "1").converter("3") == Decimal("1.000")
+
+
+def deve_atender_somente_o_mesmo_material_e_a_mesma_unidade():
+    rolo = ConversaoUnidade(TECIDO, ROLO, "1", "50")
+    assert rolo.atende(TECIDO, ROLO) is True
+    assert rolo.atende(TECIDO, 3) is False
+    assert rolo.atende(9, ROLO) is False
