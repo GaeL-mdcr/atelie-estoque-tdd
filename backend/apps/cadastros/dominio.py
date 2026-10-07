@@ -71,3 +71,8 @@ class Material(Arquivavel):
 
     def cores(self):
         return [cor.nome for cor, _ in self._variantes]
+
+    def estoque_da_cor(self, cor):
+        for existente, estoque in self._variantes:
+            if existente.chave() == cor.chave():
+                return estoque
