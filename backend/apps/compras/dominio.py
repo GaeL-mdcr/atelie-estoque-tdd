@@ -22,6 +22,10 @@ class CompraConfirmadaError(ErroDeNegocio):
     """Tentou mexer numa compra que já foi confirmada."""
 
 
+class ItemNaoEncontradoError(ErroDeNegocio):
+    """A posição informada não tem item nenhum."""
+
+
 class ItemCompra:
     def __init__(self, variante_id, material_id, unidade_compra_id, unidade_estoque_id,
                  qtd_compra, vl_unitario_compra, conversao=None):
@@ -75,11 +79,15 @@ class Compra:
     def editar_item(self, posicao, item):
         if self.confirmada:
             raise CompraConfirmadaError("Essa compra já foi confirmada e não pode mais ser alterada.")
+        if not 0 <= posicao < len(self._itens):
+            raise ItemNaoEncontradoError("Esse item não está na compra.")
         self._itens[posicao] = item
 
     def remover_item(self, posicao):
         if self.confirmada:
             raise CompraConfirmadaError("Essa compra já foi confirmada e não pode mais ser alterada.")
+        if not 0 <= posicao < len(self._itens):
+            raise ItemNaoEncontradoError("Esse item não está na compra.")
         del self._itens[posicao]
 
     def confirmar(self):
