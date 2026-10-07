@@ -62,3 +62,10 @@ class Producao:
         retorno = MovimentacaoMaterial(RETORNO, uso.variante_id, qtd, uso.custo_unitario, quando, uso.id)
         self._movimentacoes.append(retorno)
         return retorno
+
+    def quantidade_devolvivel(self, id_uso):
+        uso = next(m for m in self._movimentacoes if m.id == id_uso)
+        devolvido = sum(
+            (m.quantidade for m in self._movimentacoes if m.id_uso_origem == id_uso), Decimal("0")
+        )
+        return quantidade(uso.quantidade - devolvido)
