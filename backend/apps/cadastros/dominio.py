@@ -4,7 +4,7 @@ Cadastros do ateliê: cor, categoria e material.
 
 import re
 
-from apps.comum.erros import ErroDeNegocio
+from apps.comum.erros import ErroDeNegocio, ValorInvalidoError
 from apps.comum.numeros import texto_obrigatorio
 
 FORMATO_HEX = re.compile(r"#[0-9A-Fa-f]{6}")
@@ -26,6 +26,11 @@ class Cor:
 
 
 class Categoria:
+    MATERIAL = "M"
+    PRODUCAO = "P"
+
     def __init__(self, nome, tipo):
         self.nome = texto_obrigatorio(nome, "nome da categoria")
+        if tipo not in (self.MATERIAL, self.PRODUCAO):
+            raise ValorInvalidoError("A categoria precisa ser de material (M) ou de produção (P).")
         self.tipo = tipo
