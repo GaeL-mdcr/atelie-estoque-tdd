@@ -10,7 +10,7 @@ from decimal import Decimal
 import pytest
 
 from apps.comum.erros import ValorInvalidoError
-from apps.comum.numeros import decimal_de
+from apps.comum.numeros import decimal_de, dinheiro, fator, quantidade
 
 
 def deve_converter_texto_e_inteiro_para_decimal():
@@ -32,3 +32,11 @@ def nao_deve_aceitar_float_nem_bool(valor):
 def nao_deve_aceitar_valor_que_nao_e_numero(valor):
     with pytest.raises(ValorInvalidoError):
         decimal_de(valor)
+
+
+# Dinheiro com 2 casas, quantidade com 3 e fator com 6, sempre "meio para cima".
+def deve_arredondar_meio_para_cima_em_cada_escala():
+    assert dinheiro("2.345") == Decimal("2.35")
+    assert dinheiro("2") == Decimal("2.00")
+    assert quantidade("1.2345") == Decimal("1.235")
+    assert fator("0.3333335") == Decimal("0.333334")
