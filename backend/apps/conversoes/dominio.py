@@ -20,3 +20,6 @@ class ConversaoUnidade:
 
     def converter(self, qtd_compra):
         return quantidade(decimal_de(qtd_compra) * self.fator())
+
+    def atende(self, material_id, unidade_compra_id):
+        return self.material_id == material_id and self.unidade_compra_id == unidade_compra_id
