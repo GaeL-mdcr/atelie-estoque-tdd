@@ -14,6 +14,7 @@ from apps.estoque.dominio import EstoqueVariante, SaldoInsuficienteError
 from apps.producoes.dominio import (
     Producao,
     ProducaoConcluidaError,
+    ProducaoNaoConcluidaError,
     RetornoExcedeUsoError,
     UsoNaoEncontradoError,
     VarianteDiferenteError,
@@ -187,3 +188,13 @@ def deve_reabrir_com_motivo_e_guardar_historico(saia, azul):
     saia.concluir(date(2026, 10, 25))
     saia.reabrir("Trocar botões", usuario_id=1, quando=T2)
     assert [e.motivo for e in saia.historico_reaberturas()] == ["Cliente pediu ajuste na barra", "Trocar botões"]
+
+
+def nao_deve_reabrir_sem_motivo_ou_sem_estar_concluida(saia):
+    with pytest.raises(ProducaoNaoConcluidaError):
+        saia.reabrir("Ajuste", usuario_id=1, quando=T2)
+    saia.concluir(CONCLUSAO)
+    with pytest.raises(ValorObrigatorioError):
+        saia.reabrir("   ", usuario_id=1, quando=T2)
+    assert saia.concluida is True
+    assert saia.historico_reaberturas() == ()
