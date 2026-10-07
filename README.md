@@ -81,23 +81,6 @@ cd app
 flutter test --coverage
 ```
 
-## Como trabalhamos (combinado da dupla)
-
-1. Escreve o teste → roda → **tem que falhar** → commit `[RED]`
-2. Escreve o mínimo de código para passar → roda → **verde** → commit `[GREEN]`
-3. Melhora o código sem quebrar nada → roda → **verde** → commit `[REFACTOR]` (quando houver)
-
-Mensagens de commit e comentários em português, do jeito que a gente fala. Exemplo:
-
-```
-[RED] teste do fator de conversão: 1 rolo tem que virar 50 metros
-[GREEN] fator de conversão calculado, teste passando
-[REFACTOR] tirei a conta repetida e deixei o arredondamento num lugar só
-```
-
-Nome dos testes no padrão `deve<Ação>Quando<Condição>`, adaptado ao Python:
-`deve_calcular_fator_quando_unidades_forem_diferentes`.
-
 ## Resultados
 
 | Métrica | Backend | App |
@@ -110,10 +93,6 @@ Nome dos testes no padrão `deve<Ação>Quando<Condição>`, adaptado ao Python:
 ## Integrantes
 
 - Gabriel Mallezan da Costa Ribeiro
-- _(dupla a definir)_
 
-## Documentos de origem
 
-Requisitos V3.2, Proposta de Banco V4.8, Lógico_1 (21/09/2026), Arquitetura V3.1
-(Mapa, Guia do Programador, Referência SQL) e Interface V2.2 — resumidos e conciliados em
-[`docs/CONTEXTO.md`](docs/CONTEXTO.md).
+
