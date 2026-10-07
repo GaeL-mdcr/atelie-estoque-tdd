@@ -32,6 +32,10 @@ class ProducaoConcluidaError(ErroDeNegocio):
     """A peça já está pronta e não aceita mais mudança de material."""
 
 
+class ProducaoNaoConcluidaError(ErroDeNegocio):
+    """A ação só vale para peça concluída (reabrir, publicar)."""
+
+
 @dataclass(frozen=True)
 class MovimentacaoMaterial:
     """Um uso (U) ou retorno (R) de material. Depois de criada, não muda mais."""
@@ -80,6 +84,9 @@ class Producao:
         self.dt_finalizacao = data
 
     def reabrir(self, motivo, usuario_id, quando):
+        if not self.concluida:
+            raise ProducaoNaoConcluidaError("Só dá para reabrir uma peça que já foi concluída.")
+        motivo = texto_obrigatorio(motivo, "motivo da reabertura")
         evento = EventoReabertura(usuario_id, motivo, quando, self.dt_finalizacao)
         self.dt_finalizacao = None
         self._reaberturas.append(evento)
