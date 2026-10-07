@@ -3,7 +3,7 @@ Compra de materiais: os itens e a compra que junta todos eles.
 """
 
 from apps.comum.erros import ErroDeNegocio
-from apps.comum.numeros import dinheiro, quantidade
+from apps.comum.numeros import dinheiro, exigir_nao_negativo, exigir_positivo, quantidade
 
 
 class ConversaoAusenteError(ErroDeNegocio):
@@ -18,8 +18,8 @@ class ItemCompra:
     def __init__(self, variante_id, material_id, unidade_compra_id, unidade_estoque_id,
                  qtd_compra, vl_unitario_compra, conversao=None):
         self.variante_id = variante_id
-        self.qtd_compra = quantidade(qtd_compra)
-        self.vl_unitario_compra = dinheiro(vl_unitario_compra)
+        self.qtd_compra = quantidade(exigir_positivo(qtd_compra, "quantidade comprada"))
+        self.vl_unitario_compra = dinheiro(exigir_nao_negativo(vl_unitario_compra, "preço unitário"))
         if unidade_compra_id == unidade_estoque_id:
             self.qtd_entrada_estoque = self.qtd_compra
         elif conversao is None:
