@@ -51,3 +51,6 @@ class Producao:
         uso = MovimentacaoMaterial(USO, estoque.variante_id, qtd, custo, quando)
         self._movimentacoes.append(uso)
         return uso
+
+    def movimentacoes(self):
+        return tuple(self._movimentacoes)
