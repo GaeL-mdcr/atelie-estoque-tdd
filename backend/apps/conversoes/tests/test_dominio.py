@@ -49,3 +49,13 @@ def nao_deve_aceitar_equivalencia_zero_ou_negativa(compra, estoque):
 def nao_deve_converter_quantidade_zero_ou_negativa(qtd):
     with pytest.raises(QuantidadeInvalidaError):
         ConversaoUnidade(TECIDO, ROLO, "1", "50").converter(qtd)
+
+
+# Corrigir a equivalência passa pela mesma validação, e um erro não estraga a que já valia.
+def deve_alterar_equivalencia_validando_de_novo():
+    rolo = ConversaoUnidade(TECIDO, ROLO, "1", "50")
+    rolo.alterar("1", "25")
+    assert rolo.fator() == Decimal("25.000000")
+    with pytest.raises(QuantidadeInvalidaError):
+        rolo.alterar("0", "25")
+    assert rolo.fator() == Decimal("25.000000")
