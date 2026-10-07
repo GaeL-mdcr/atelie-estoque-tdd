@@ -18,3 +18,6 @@ class ItemCompra:
 
     def total(self):
         return dinheiro(self.qtd_compra * self.vl_unitario_compra)
+
+    def custo_unitario_entrada(self):
+        return dinheiro(self.total() / self.qtd_entrada_estoque)
