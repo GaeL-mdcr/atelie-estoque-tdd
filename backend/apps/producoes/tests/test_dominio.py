@@ -11,7 +11,7 @@ import pytest
 from apps.cadastros.dominio import Categoria, CategoriaIncompativelError
 from apps.comum.erros import ValorObrigatorioError
 from apps.estoque.dominio import EstoqueVariante, SaldoInsuficienteError
-from apps.producoes.dominio import Producao
+from apps.producoes.dominio import Producao, RetornoExcedeUsoError
 
 SAIA = Categoria("Saia", "P")
 T1 = datetime(2026, 9, 18, 17, 15, tzinfo=timezone.utc)
@@ -81,3 +81,15 @@ def deve_calcular_quanto_ainda_pode_voltar(saia, azul):
     uso = saia.registrar_uso(azul, "3", T1)
     saia.registrar_retorno(uso.id, azul, "0.5", T2)
     assert saia.quantidade_devolvivel(uso.id) == Decimal("2.500")
+
+
+# Dois retornos que, somados, passam do usado: o segundo é recusado e o estoque não muda.
+def nao_deve_devolver_mais_que_o_devolvivel(saia, azul):
+    uso = saia.registrar_uso(azul, "3", T1)
+    with pytest.raises(RetornoExcedeUsoError):
+        saia.registrar_retorno(uso.id, azul, "3.5", T2)
+    saia.registrar_retorno(uso.id, azul, "2.5", T2)
+    with pytest.raises(RetornoExcedeUsoError):
+        saia.registrar_retorno(uso.id, azul, "0.501", T2)
+    assert azul.saldo == Decimal("49.500")
+    assert len(saia.movimentacoes()) == 2
