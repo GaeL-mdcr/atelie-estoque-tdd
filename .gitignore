@@ -31,3 +31,7 @@ app/pubspec.lock.bak
 *.iml
 .DS_Store
 Thumbs.db
+
+# ---------- Claude Code (pessoal, não vai para o repositório) ----------
+.claude/settings.local.json
+CLAUDE.local.md
