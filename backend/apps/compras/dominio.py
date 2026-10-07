@@ -64,3 +64,6 @@ class Compra:
 
     def editar_item(self, posicao, item):
         self._itens[posicao] = item
+
+    def remover_item(self, posicao):
+        del self._itens[posicao]
