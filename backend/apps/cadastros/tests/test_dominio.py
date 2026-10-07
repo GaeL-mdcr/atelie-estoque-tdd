@@ -4,7 +4,7 @@ Testes dos cadastros: cor, categoria e material.
 
 import pytest
 
-from apps.cadastros.dominio import Categoria, Cor, CorInvalidaError
+from apps.cadastros.dominio import Categoria, Cor, CorInvalidaError, Material
 from apps.comum.erros import ValorInvalidoError, ValorObrigatorioError
 
 
@@ -51,3 +51,17 @@ def deve_arquivar_e_reativar_cor():
     assert azul.ativo is False
     azul.reativar()
     assert azul.ativo is True
+
+
+# ---------- Material ----------
+
+TECIDO = Categoria("Tecido", "M")
+SAIA = Categoria("Saia", "P")
+METRO = 1
+
+
+def deve_criar_material_ativo_com_categoria_de_material():
+    oxford = Material("Tecido Oxford", TECIDO, METRO)
+    assert oxford.nome == "Tecido Oxford"
+    assert oxford.ativo is True
+    assert oxford.cores() == []
