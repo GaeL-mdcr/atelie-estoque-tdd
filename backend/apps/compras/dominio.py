@@ -10,6 +10,10 @@ class ConversaoAusenteError(ErroDeNegocio):
     """Comprou numa unidade diferente da do estoque e não tem conversão cadastrada."""
 
 
+class ConversaoIncompativelError(ErroDeNegocio):
+    """A conversão informada é de outro material ou de outra unidade de compra."""
+
+
 class ItemCompra:
     def __init__(self, variante_id, material_id, unidade_compra_id, unidade_estoque_id,
                  qtd_compra, vl_unitario_compra, conversao=None):
@@ -22,6 +26,8 @@ class ItemCompra:
             raise ConversaoAusenteError(
                 "Essa unidade de compra é diferente da do estoque. Cadastre quanto ela vale antes de lançar a compra."
             )
+        elif not conversao.atende(material_id, unidade_compra_id):
+            raise ConversaoIncompativelError("Essa conversão não é deste material ou desta unidade de compra.")
         else:
             self.qtd_entrada_estoque = conversao.converter(self.qtd_compra)
 
