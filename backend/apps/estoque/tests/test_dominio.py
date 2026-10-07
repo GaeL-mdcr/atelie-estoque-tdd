@@ -72,3 +72,9 @@ def deve_devolver_ao_saldo_e_recalcular_media_no_retorno():
     vazio = EstoqueVariante()
     vazio.registrar_retorno("1", "4.60")
     assert (vazio.saldo, vazio.custo_medio) == (Decimal("1.000"), Decimal("4.60"))
+
+
+# Abaixo do mínimo é estritamente menor: com 5 m e mínimo 5 m ainda não precisa avisar.
+def deve_avisar_quando_abaixo_do_minimo():
+    assert EstoqueVariante("4", "1", "5").abaixo_do_minimo() is True
+    assert EstoqueVariante("5", "1", "5").abaixo_do_minimo() is False
