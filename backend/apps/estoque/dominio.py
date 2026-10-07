@@ -18,7 +18,8 @@ class SaldoInsuficienteError(ErroDeNegocio):
 
 
 class EstoqueVariante:
-    def __init__(self, qtd_inicial="0", vl_unitario_inicial="0", qtd_estoque_minimo="0"):
+    def __init__(self, qtd_inicial="0", vl_unitario_inicial="0", qtd_estoque_minimo="0", *, variante_id=None):
+        self.variante_id = variante_id
         self._saldo = quantidade(exigir_nao_negativo(qtd_inicial, "quantidade inicial"))
         self._custo_medio = dinheiro(exigir_nao_negativo(vl_unitario_inicial, "valor unitário inicial"))
         self._qtd_estoque_minimo = quantidade(exigir_nao_negativo(qtd_estoque_minimo, "estoque mínimo"))
