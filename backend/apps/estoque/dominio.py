@@ -25,3 +25,7 @@ class EstoqueVariante:
         valor_em_estoque = self._saldo * self._custo_medio + decimal_de(custo_total)
         self._saldo = quantidade(self._saldo + qtd)
         self._custo_medio = dinheiro(valor_em_estoque / self._saldo)
+
+    def registrar_saida(self, qtd):
+        self._saldo = quantidade(self._saldo - quantidade(qtd))
+        return self._custo_medio
