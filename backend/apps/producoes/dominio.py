@@ -65,13 +65,11 @@ class Producao:
         return self.dt_finalizacao is not None
 
     def concluir(self, data):
-        if self.concluida:
-            raise ProducaoConcluidaError("Essa peça já foi concluída. Reabra a produção para mexer no material.")
+        self._exigir_em_andamento()
         self.dt_finalizacao = data
 
     def registrar_uso(self, estoque, qtd, quando):
-        if self.concluida:
-            raise ProducaoConcluidaError("Essa peça já foi concluída. Reabra a produção para mexer no material.")
+        self._exigir_em_andamento()
         if estoque.variante_id is None:
             raise ValorObrigatorioError("Informe de qual material e cor saiu o material.")
         qtd = quantidade(qtd)
@@ -84,8 +82,7 @@ class Producao:
         return tuple(self._movimentacoes)
 
     def registrar_retorno(self, id_uso_origem, estoque, qtd, quando):
-        if self.concluida:
-            raise ProducaoConcluidaError("Essa peça já foi concluída. Reabra a produção para mexer no material.")
+        self._exigir_em_andamento()
         uso = self._uso(id_uso_origem)
         if estoque.variante_id != uso.variante_id:
             raise VarianteDiferenteError("O material tem que voltar para a mesma cor de onde saiu.")
@@ -115,6 +112,10 @@ class Producao:
 
     def custo_total(self):
         return dinheiro(self.custo_materiais() + self.vl_mao_obra)
+
+    def _exigir_em_andamento(self):
+        if self.concluida:
+            raise ProducaoConcluidaError("Essa peça já foi concluída. Reabra a produção para mudar alguma coisa.")
 
     def _uso(self, id_uso):
         for movimentacao in self._movimentacoes:
