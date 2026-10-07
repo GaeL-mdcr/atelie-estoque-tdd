@@ -5,7 +5,7 @@ Exemplo do ateliê: o tecido é comprado em rolo e guardado em metro,
 e 1 rolo = 50 m. O fator é estoque ÷ compra.
 """
 
-from apps.comum.numeros import decimal_de, exigir_positivo, fator, quantidade
+from apps.comum.numeros import exigir_positivo, fator, quantidade
 
 
 class ConversaoUnidade:
@@ -19,7 +19,7 @@ class ConversaoUnidade:
         return fator(self.qtd_equivalente_estoque / self.qtd_equivalente_compra)
 
     def converter(self, qtd_compra):
-        return quantidade(decimal_de(qtd_compra) * self.fator())
+        return quantidade(exigir_positivo(qtd_compra, "quantidade comprada") * self.fator())
 
     def atende(self, material_id, unidade_compra_id):
         return self.material_id == material_id and self.unidade_compra_id == unidade_compra_id
