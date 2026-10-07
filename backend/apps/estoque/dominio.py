@@ -21,6 +21,7 @@ class EstoqueVariante:
     def __init__(self, qtd_inicial="0", vl_unitario_inicial="0", qtd_estoque_minimo="0"):
         self._saldo = quantidade(qtd_inicial)
         self._custo_medio = dinheiro(vl_unitario_inicial)
+        self._qtd_estoque_minimo = quantidade(qtd_estoque_minimo)
 
     @property
     def saldo(self):
@@ -29,6 +30,9 @@ class EstoqueVariante:
     @property
     def custo_medio(self):
         return self._custo_medio
+
+    def abaixo_do_minimo(self):
+        return self._saldo < self._qtd_estoque_minimo
 
     def registrar_entrada(self, qtd, custo_total):
         self._somar_com_media_ponderada(quantidade(qtd), decimal_de(custo_total))
