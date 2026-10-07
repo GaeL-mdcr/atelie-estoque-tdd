@@ -67,7 +67,7 @@ class Material(Arquivavel):
         self._variantes = []  # pares (cor, estoque), na ordem em que foram cadastrados
 
     def adicionar_cor(self, cor, qtd_estoque_minimo="0", qtd_inicial="0", vl_unitario_inicial="0"):
-        if any(existente.chave() == cor.chave() for existente, _ in self._variantes):
+        if self._procurar(cor) is not None:
             raise VarianteDuplicadaError(f"A cor {cor.rotulo()} já está cadastrada neste material.")
         estoque = EstoqueVariante(qtd_inicial, vl_unitario_inicial, qtd_estoque_minimo)
         self._variantes.append((cor, estoque))
@@ -77,7 +77,13 @@ class Material(Arquivavel):
         return [cor.nome for cor, _ in self._variantes]
 
     def estoque_da_cor(self, cor):
+        estoque = self._procurar(cor)
+        if estoque is None:
+            raise VarianteNaoEncontradaError(f"Este material não tem a cor {cor.rotulo()} cadastrada.")
+        return estoque
+
+    def _procurar(self, cor):
         for existente, estoque in self._variantes:
             if existente.chave() == cor.chave():
                 return estoque
-        raise VarianteNaoEncontradaError(f"Este material não tem a cor {cor.rotulo()} cadastrada.")
+        return None
