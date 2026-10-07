@@ -114,3 +114,9 @@ def deve_editar_o_item_na_posicao(compra):
     compra.editar_item(0, novo)
     assert compra.itens[0] is novo
     assert compra.total() == Decimal("32.50")
+
+
+def deve_remover_item_e_ajustar_o_total(compra):
+    com_dois_itens(compra)
+    compra.remover_item(1)
+    assert compra.total() == Decimal("160.00")
