@@ -42,3 +42,12 @@ def deve_criar_categoria_de_material_ou_producao():
     assert Categoria("Saia", "P").tipo == Categoria.PRODUCAO
     with pytest.raises(ValorInvalidoError):
         Categoria("Saia", "X")
+
+
+def deve_arquivar_e_reativar_cor():
+    azul = Cor("Azul")
+    assert azul.ativo is True
+    azul.arquivar()
+    assert azul.ativo is False
+    azul.reativar()
+    assert azul.ativo is True
