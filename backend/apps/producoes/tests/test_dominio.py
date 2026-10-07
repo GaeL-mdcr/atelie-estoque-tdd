@@ -164,3 +164,10 @@ def deve_bloquear_uso_e_retorno_depois_de_concluir(saia, azul):
     with pytest.raises(ProducaoConcluidaError):
         saia.registrar_retorno(uso.id, azul, "1", T2)
     assert azul.saldo == Decimal("47.000")
+
+
+def nao_deve_concluir_duas_vezes(saia):
+    saia.concluir(CONCLUSAO)
+    with pytest.raises(ProducaoConcluidaError):
+        saia.concluir(date(2026, 10, 21))
+    assert saia.dt_finalizacao == CONCLUSAO
