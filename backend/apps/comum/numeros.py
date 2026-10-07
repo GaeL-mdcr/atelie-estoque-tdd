@@ -30,13 +30,18 @@ def decimal_de(valor):
     return numero
 
 
+
+def _arredondar(valor, casas):
+    return decimal_de(valor).quantize(casas, rounding=ROUND_HALF_UP)
+
+
 def quantidade(valor):
-    return decimal_de(valor).quantize(CASAS_QUANTIDADE, rounding=ROUND_HALF_UP)
+    return _arredondar(valor, CASAS_QUANTIDADE)
 
 
 def dinheiro(valor):
-    return decimal_de(valor).quantize(CASAS_DINHEIRO, rounding=ROUND_HALF_UP)
+    return _arredondar(valor, CASAS_DINHEIRO)
 
 
 def fator(valor):
-    return decimal_de(valor).quantize(CASAS_FATOR, rounding=ROUND_HALF_UP)
+    return _arredondar(valor, CASAS_FATOR)
