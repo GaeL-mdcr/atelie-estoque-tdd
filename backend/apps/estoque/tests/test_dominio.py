@@ -94,3 +94,13 @@ def nao_deve_aceitar_quantidade_ou_valor_invalido():
     with pytest.raises(ValorInvalidoError):
         EstoqueVariante("-1")
     assert (estoque.saldo, estoque.custo_medio) == (Decimal("10.000"), Decimal("5.00"))
+
+
+# 0,0001 m é maior que zero, mas com 3 casas vira 0,000. Num estoque vazio isso
+# dividiria por zero na média; tem que ser recusado como quantidade inválida.
+def nao_deve_aceitar_quantidade_que_arredonda_para_zero():
+    estoque = EstoqueVariante()
+    with pytest.raises(QuantidadeInvalidaError):
+        estoque.registrar_entrada("0.0001", "1")
+    with pytest.raises(QuantidadeInvalidaError):
+        estoque.registrar_retorno("0.0004", "1")
