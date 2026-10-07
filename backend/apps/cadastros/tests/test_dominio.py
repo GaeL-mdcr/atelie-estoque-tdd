@@ -4,7 +4,8 @@ Testes dos cadastros: cor, categoria e material.
 
 import pytest
 
-from apps.cadastros.dominio import Cor, CorInvalidaError
+from apps.cadastros.dominio import Categoria, Cor, CorInvalidaError
+from apps.comum.erros import ValorObrigatorioError
 
 
 def deve_guardar_nome_limpo_e_hex_em_maiusculas():
@@ -24,3 +25,10 @@ def deve_aceitar_cor_sem_hex():
 def nao_deve_aceitar_hex_fora_do_formato(codigo):
     with pytest.raises(CorInvalidaError):
         Cor("Azul", codigo)
+
+
+def nao_deve_aceitar_nome_vazio():
+    with pytest.raises(ValorObrigatorioError):
+        Cor("   ")
+    with pytest.raises(ValorObrigatorioError):
+        Categoria("", "M")
