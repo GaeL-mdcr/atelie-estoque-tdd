@@ -75,3 +75,9 @@ def deve_registrar_retorno_apontando_para_o_uso(saia, azul):
     assert retorno.quantidade == Decimal("0.500")
     assert azul.saldo == Decimal("47.500")
     assert saia.movimentacoes() == (uso, retorno)
+
+
+def deve_calcular_quanto_ainda_pode_voltar(saia, azul):
+    uso = saia.registrar_uso(azul, "3", T1)
+    saia.registrar_retorno(uso.id, azul, "0.5", T2)
+    assert saia.quantidade_devolvivel(uso.id) == Decimal("2.500")
