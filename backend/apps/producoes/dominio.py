@@ -28,6 +28,10 @@ class VarianteDiferenteError(ErroDeNegocio):
     """Retorno indo para o estoque de outra cor."""
 
 
+class ProducaoConcluidaError(ErroDeNegocio):
+    """A peça já está pronta e não aceita mais mudança de material."""
+
+
 @dataclass(frozen=True)
 class MovimentacaoMaterial:
     """Um uso (U) ou retorno (R) de material. Depois de criada, não muda mais."""
@@ -54,8 +58,18 @@ class Producao:
         self.pasta_id = pasta_id
         self.descricao = descricao
         self._movimentacoes = []
+        self.dt_finalizacao = None
+
+    @property
+    def concluida(self):
+        return self.dt_finalizacao is not None
+
+    def concluir(self, data):
+        self.dt_finalizacao = data
 
     def registrar_uso(self, estoque, qtd, quando):
+        if self.concluida:
+            raise ProducaoConcluidaError("Essa peça já foi concluída. Reabra a produção para mexer no material.")
         if estoque.variante_id is None:
             raise ValorObrigatorioError("Informe de qual material e cor saiu o material.")
         qtd = quantidade(qtd)
@@ -68,6 +82,8 @@ class Producao:
         return tuple(self._movimentacoes)
 
     def registrar_retorno(self, id_uso_origem, estoque, qtd, quando):
+        if self.concluida:
+            raise ProducaoConcluidaError("Essa peça já foi concluída. Reabra a produção para mexer no material.")
         uso = self._uso(id_uso_origem)
         if estoque.variante_id != uso.variante_id:
             raise VarianteDiferenteError("O material tem que voltar para a mesma cor de onde saiu.")
