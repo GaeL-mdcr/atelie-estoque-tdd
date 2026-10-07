@@ -24,6 +24,10 @@ class UsoNaoEncontradoError(ErroDeNegocio):
     """O uso de origem não existe nesta produção (ou o id é de um retorno)."""
 
 
+class VarianteDiferenteError(ErroDeNegocio):
+    """Retorno indo para o estoque de outra cor."""
+
+
 @dataclass(frozen=True)
 class MovimentacaoMaterial:
     """Um uso (U) ou retorno (R) de material. Depois de criada, não muda mais."""
@@ -65,6 +69,8 @@ class Producao:
 
     def registrar_retorno(self, id_uso_origem, estoque, qtd, quando):
         uso = self._uso(id_uso_origem)
+        if estoque.variante_id != uso.variante_id:
+            raise VarianteDiferenteError("O material tem que voltar para a mesma cor de onde saiu.")
         qtd = quantidade(qtd)
         devolvivel = self.quantidade_devolvivel(uso.id)
         if qtd > devolvivel:
