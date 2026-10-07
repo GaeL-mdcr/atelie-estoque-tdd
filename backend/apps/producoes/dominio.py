@@ -90,6 +90,7 @@ class Producao:
         motivo = texto_obrigatorio(motivo, "motivo da reabertura")
         evento = EventoReabertura(usuario_id, motivo, quando, self.dt_finalizacao)
         self.dt_finalizacao = None
+        self.publicada = False
         self._reaberturas.append(evento)
         return evento
 
