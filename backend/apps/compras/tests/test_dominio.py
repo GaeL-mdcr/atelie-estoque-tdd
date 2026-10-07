@@ -11,9 +11,10 @@ import pytest
 from apps.comum.erros import QuantidadeInvalidaError, ValorInvalidoError
 from apps.compras.dominio import (
     Compra,
+    CompraConfirmadaError,
     CompraSemItensError,
     ConversaoAusenteError,
-     ConversaoIncompativelError,
+    ConversaoIncompativelError,
     ItemCompra,
 )
 from apps.conversoes.dominio import ConversaoUnidade
@@ -137,3 +138,17 @@ def nao_deve_confirmar_compra_sem_itens(compra):
     with pytest.raises(CompraSemItensError):
         compra.confirmar()
     assert compra.confirmada is False
+
+
+# Depois de confirmada, a compra já mexeu no estoque: não dá mais para mudar nada nela.
+def nao_deve_mexer_em_compra_confirmada(compra):
+    com_dois_itens(compra).confirmar()
+    with pytest.raises(CompraConfirmadaError):
+        compra.adicionar_item(item_em_metro("1", "10"))
+    with pytest.raises(CompraConfirmadaError):
+        compra.editar_item(0, item_em_metro("1", "10"))
+    with pytest.raises(CompraConfirmadaError):
+        compra.remover_item(0)
+    with pytest.raises(CompraConfirmadaError):
+        compra.confirmar()
+    assert compra.total() == Decimal("182.50")
