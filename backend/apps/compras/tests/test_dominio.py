@@ -164,3 +164,12 @@ def nao_deve_aceitar_posicao_que_nao_existe(compra, posicao):
     with pytest.raises(ItemNaoEncontradoError):
         compra.editar_item(posicao, item_em_metro("1", "10"))
     assert len(compra.itens) == 1
+
+
+# Mesmo bug que apareceu no estoque: quantidade que arredonda para zero (na compra
+# ou depois da conversão) faria o custo de entrada dividir por zero.
+def nao_deve_aceitar_item_que_entra_zero_no_estoque():
+    with pytest.raises(QuantidadeInvalidaError):
+        item_em_metro("0.0001", "5")
+    with pytest.raises(QuantidadeInvalidaError):
+        item_em_rolo("0.001", "80", ConversaoUnidade(TECIDO, ROLO, "3", "1"))
