@@ -20,16 +20,21 @@ class ItemCompra:
         self.variante_id = variante_id
         self.qtd_compra = quantidade(exigir_positivo(qtd_compra, "quantidade comprada"))
         self.vl_unitario_compra = dinheiro(exigir_nao_negativo(vl_unitario_compra, "preço unitário"))
+        # A entrada é calculada uma vez só e fica guardada: é o histórico da compra (RN09).
+        self.qtd_entrada_estoque = self._calcular_entrada(
+            material_id, unidade_compra_id, unidade_estoque_id, conversao
+        )
+
+    def _calcular_entrada(self, material_id, unidade_compra_id, unidade_estoque_id, conversao):
         if unidade_compra_id == unidade_estoque_id:
-            self.qtd_entrada_estoque = self.qtd_compra
-        elif conversao is None:
+            return self.qtd_compra
+        if conversao is None:
             raise ConversaoAusenteError(
                 "Essa unidade de compra é diferente da do estoque. Cadastre quanto ela vale antes de lançar a compra."
             )
-        elif not conversao.atende(material_id, unidade_compra_id):
+        if not conversao.atende(material_id, unidade_compra_id):
             raise ConversaoIncompativelError("Essa conversão não é deste material ou desta unidade de compra.")
-        else:
-            self.qtd_entrada_estoque = conversao.converter(self.qtd_compra)
+        return conversao.converter(self.qtd_compra)
 
     def total(self):
         return dinheiro(self.qtd_compra * self.vl_unitario_compra)
