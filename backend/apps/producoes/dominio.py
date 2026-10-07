@@ -10,7 +10,7 @@ from decimal import Decimal
 
 from apps.cadastros.dominio import Categoria, CategoriaIncompativelError
 from apps.comum.erros import ErroDeNegocio, ValorObrigatorioError
-from apps.comum.numeros import dinheiro, quantidade, texto_obrigatorio
+from apps.comum.numeros import dinheiro, formatar, quantidade, texto_obrigatorio
 
 USO = "U"
 RETORNO = "R"
@@ -74,8 +74,7 @@ class Producao:
         qtd = quantidade(qtd)
         devolvivel = self.quantidade_devolvivel(uso.id)
         if qtd > devolvivel:
-            texto = format(devolvivel.normalize(), "f").replace(".", ",")
-            raise RetornoExcedeUsoError(f"Desse uso ainda podem voltar no máximo {texto}.")
+            raise RetornoExcedeUsoError(f"Desse uso ainda podem voltar no máximo {formatar(devolvivel)}.")
         estoque.registrar_retorno(qtd, uso.custo_unitario)
         retorno = MovimentacaoMaterial(RETORNO, uso.variante_id, qtd, uso.custo_unitario, quando, uso.id)
         self._movimentacoes.append(retorno)

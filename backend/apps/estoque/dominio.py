@@ -5,7 +5,7 @@ Cada cor tem o seu: mexer no Azul não muda o Branco do mesmo tecido.
 """
 
 from apps.comum.erros import ErroDeNegocio
-from apps.comum.numeros import dinheiro, exigir_nao_negativo, exigir_positivo, quantidade
+from apps.comum.numeros import dinheiro, exigir_nao_negativo, exigir_positivo, formatar, quantidade
 
 
 class SaldoInsuficienteError(ErroDeNegocio):
@@ -13,8 +13,7 @@ class SaldoInsuficienteError(ErroDeNegocio):
 
     def __init__(self, disponivel):
         self.disponivel = disponivel
-        texto = format(disponivel.normalize(), "f").replace(".", ",")
-        super().__init__(f"Não tem material suficiente. Disponível: {texto}.")
+        super().__init__(f"Não tem material suficiente. Disponível: {formatar(disponivel)}.")
 
 
 class EstoqueVariante:

@@ -66,3 +66,8 @@ def texto_obrigatorio(texto, campo):
     if not limpo:
         raise ValorObrigatorioError(f"Preencha o campo {campo}.")
     return limpo
+
+
+def formatar(valor):
+    """Número do jeito que aparece na tela: 1,5 em vez de 1.500."""
+    return format(decimal_de(valor).normalize(), "f").replace(".", ",")
