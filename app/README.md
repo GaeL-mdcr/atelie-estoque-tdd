@@ -5,18 +5,14 @@ Aplicativo para celular (Android) e navegador (web). Guarda os dados num SQLite 
 
 ## Primeira vez na máquina
 
-As pastas de plataforma (`android/`, `web/`) não vão no primeiro commit porque são geradas
-pelo próprio Flutter. Dentro desta pasta `app/`, rode uma vez:
+As pastas de plataforma (`android/`, `web/`) já estão no repositório (geradas com o
+Flutter 3.47.6). Dentro desta pasta `app/`, basta:
 
 ```bash
-flutter create --platforms=android,web --project-name atelie .
 flutter pub get
 ```
 
-> O `flutter create .` não apaga o `lib/main.dart` nem o `pubspec.yaml` que já existem.
-> Ele cria um `test/widget_test.dart` de exemplo que procura um `MyApp` que não existe aqui:
-> **apague esse arquivo** antes de rodar os testes.
-> Se o `pub get` reclamar de versão, rode `flutter pub upgrade --major-versions`.
+> No GitHub Codespaces isso já acontece sozinho quando o ambiente é criado.
 
 ## Rodando os testes
 

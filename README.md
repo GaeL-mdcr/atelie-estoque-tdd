@@ -11,7 +11,8 @@ reescrever o histórico.
 Todo o código de produção nasce de um teste que falhou antes (ciclo **Red → Green → Refactor**),
 e o histórico de commits mostra isso.
 
-> Status: **Semana 1 — estrutura e requisitos.** Ainda não existe código de produção.
+> Status: **Fase 1 concluída** — as regras de negócio do backend (domínio em Python puro) nasceram
+> todas de testes. Próximo passo: models e migrations (Fase 2).
 
 ## Arquitetura
 
@@ -35,6 +36,7 @@ atelie-estoque-tdd/
 ├── backend/                  # API Django — onde começam os ciclos TDD
 │   ├── config/               # settings, urls, wsgi/asgi
 │   ├── apps/
+│   │   ├── comum/            # Decimal (dinheiro, quantidade, fator), erros e arquivamento
 │   │   ├── contas/           # usuário e login (JWT)
 │   │   ├── cadastros/        # material, cor, variante material+cor, categoria, unidade, fornecedor
 │   │   ├── conversoes/       # 1 rolo = 50 m, etc.
@@ -44,11 +46,12 @@ atelie-estoque-tdd/
 │   │   ├── movimentacoes/    # uso (U) e retorno (R) de material
 │   │   ├── sincronizacao/    # PUSH/PULL com o celular, sem duplicar
 │   │   └── vitrine/          # reservado para o site público (futuro)
-│   │   (cada módulo tem sua pasta tests/)
+│   │   (cada módulo tem sua pasta tests/ e as regras ficam em dominio.py)
 │   ├── tests/                # testes do ambiente/configuração
 │   ├── requirements.txt      # dependências de produção
 │   ├── requirements-dev.txt  # + pytest, pytest-django, pytest-cov
 │   └── pytest.ini
+├── .devcontainer/            # ambiente do GitHub Codespaces (Python + Flutter)
 ├── app/                      # app Flutter (celular + web)
 │   ├── lib/src/              # core, features/*, sincronizacao
 │   └── test/                 # espelha lib/src
@@ -58,6 +61,12 @@ atelie-estoque-tdd/
 ```
 
 ## Como rodar os testes
+
+### No GitHub Codespaces (sem instalar nada)
+
+No GitHub, clique em **Code → Codespaces → Create codespace on main**. Na primeira vez ele monta
+o venv do backend, baixa o Flutter e roda o `pub get` sozinho (demora alguns minutos). Depois é
+só usar os mesmos comandos abaixo no terminal do Codespace.
 
 ### Backend (Python 3.12+)
 
@@ -74,10 +83,11 @@ pytest --cov --cov-report=term-missing   # com cobertura
 
 ### App Flutter
 
-Veja [`app/README.md`](app/README.md) para gerar as pastas de plataforma na primeira vez. Depois:
+As pastas de Android e web já estão no repositório. Basta:
 
 ```bash
 cd app
+flutter pub get
 flutter test --coverage
 ```
 
@@ -85,10 +95,10 @@ flutter test --coverage
 
 | Métrica | Backend | App |
 | --- | --- | --- |
-| Testes | — | — |
-| Cobertura | — | — |
+| Testes | 92 (89 de domínio + 3 de configuração) | — |
+| Cobertura | 100% dos `dominio.py` e de `apps/comum` | — |
 
-(Atualizado ao fim de cada semana.)
+Fim da Fase 1. Comando usado: `pytest --cov --cov-report=term-missing` dentro de `backend/`.
 
 ## Integrantes
 

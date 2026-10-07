@@ -60,7 +60,7 @@
   - `numeros.texto_obrigatorio(texto: str | None, campo: str) -> str` → devolve sem espaços nas pontas; vazio → `ValorObrigatorioError`
   - `arquivavel.Arquivavel` (mixin): atributo `ativo: bool`, `arquivar()`, `reativar()`; quem herda chama `self.ativo = True` no `__init__`.
 
-- [ ] **Ciclo 1 — decimal a partir de texto e inteiro**
+- [x] **Ciclo 1 — decimal a partir de texto e inteiro**
 ```python
 def deve_converter_texto_e_inteiro_para_decimal():
     assert decimal_de("1.5") == Decimal("1.5")
@@ -69,7 +69,7 @@ def deve_converter_texto_e_inteiro_para_decimal():
 ```
 Implementar `decimal_de` em `numeros.py`. Commits: `[RED] teste do decimal_de com texto, inteiro e Decimal` / `[GREEN] decimal_de convertendo texto e inteiro`.
 
-- [ ] **Ciclo 2 — recusar float e bool** (Review Focus 1)
+- [x] **Ciclo 2 — recusar float e bool** (Review Focus 1)
 ```python
 @pytest.mark.parametrize("valor", [0.1, 2.0, True])
 def nao_deve_aceitar_float_nem_bool(valor):
@@ -78,7 +78,7 @@ def nao_deve_aceitar_float_nem_bool(valor):
 ```
 Cria `erros.py` com `ErroDeNegocio` e `ValorInvalidoError`. `bool` é checado antes de `int` (porque `True` é `int` em Python).
 
-- [ ] **Ciclo 3 — recusar texto que não é número**
+- [x] **Ciclo 3 — recusar texto que não é número**
 ```python
 @pytest.mark.parametrize("valor", ["abc", "", None, "NaN", "Infinity"])
 def nao_deve_aceitar_valor_que_nao_e_numero(valor):
@@ -87,7 +87,7 @@ def nao_deve_aceitar_valor_que_nao_e_numero(valor):
 ```
 `NaN` e `Infinity` são `Decimal` válidos para o Python, mas não para o ateliê: recusar com `is_finite()`.
 
-- [ ] **Ciclo 4 — arredondamento meio para cima**
+- [x] **Ciclo 4 — arredondamento meio para cima**
 ```python
 def deve_arredondar_meio_para_cima_em_cada_escala():
     assert dinheiro("2.345") == Decimal("2.35")
@@ -97,7 +97,7 @@ def deve_arredondar_meio_para_cima_em_cada_escala():
 ```
 `quantize` com `ROUND_HALF_UP` sobre `decimal_de(valor)`.
 
-- [ ] **Ciclo 5 — exigir positivo / não negativo / texto obrigatório**
+- [x] **Ciclo 5 — exigir positivo / não negativo / texto obrigatório**
 ```python
 def deve_validar_positivo_nao_negativo_e_texto():
     assert exigir_positivo("0.001", "quantidade") == Decimal("0.001")
@@ -113,7 +113,7 @@ def deve_validar_positivo_nao_negativo_e_texto():
 ```
 A mensagem cita o campo (ex.: `"A quantidade precisa ser maior que zero."`).
 
-- [ ] **Ciclo 6 — arquivável** (em `test_arquivavel.py`)
+- [x] **Ciclo 6 — arquivável** (em `test_arquivavel.py`)
 ```python
 class Coisa(Arquivavel):
     def __init__(self):
@@ -127,7 +127,7 @@ def deve_arquivar_e_reativar():
     assert coisa.ativo is True
 ```
 
-- [ ] **Fechamento:** `pytest apps/comum -v` → 6 testes de função (com parametrizações, mais casos) passando. Ajustar `requirements-dev.txt` num commit próprio: `Atualiza o pytest para aceitar a versão 9`.
+- [x] **Fechamento:** `pytest apps/comum -v` → 6 testes de função (com parametrizações, mais casos) passando. Ajustar `requirements-dev.txt` num commit próprio: `Atualiza o pytest para aceitar a versão 9`.
 
 ---
 
@@ -142,17 +142,17 @@ def deve_arquivar_e_reativar():
 
 Nos testes: `ROLO = 2`, `METRO = 1`, `TECIDO = 1`.
 
-- [ ] **Ciclo 1 — fator inteiro**
+- [x] **Ciclo 1 — fator inteiro**
 ```python
 def deve_calcular_fator_quando_um_rolo_vale_cinquenta_metros():
     assert ConversaoUnidade(TECIDO, ROLO, "1", "50").fator() == Decimal("50.000000")
 ```
-- [ ] **Ciclo 2 — fator fracionado**
+- [x] **Ciclo 2 — fator fracionado**
 ```python
 def deve_calcular_fator_quando_tres_unidades_valem_uma():
     assert ConversaoUnidade(TECIDO, ROLO, "3", "1").fator() == Decimal("0.333333")
 ```
-- [ ] **Ciclo 3 — converter**
+- [x] **Ciclo 3 — converter**
 ```python
 def deve_converter_quantidade_comprada_para_unidade_de_estoque():
     rolo = ConversaoUnidade(TECIDO, ROLO, "1", "50")
@@ -161,7 +161,7 @@ def deve_converter_quantidade_comprada_para_unidade_de_estoque():
     assert ConversaoUnidade(TECIDO, ROLO, "3", "1").converter("3") == Decimal("1.000")
 ```
 `quantidade(decimal_de(qtd) * self.fator())` — o último caso (0,999999 → 1,000) garante o arredondamento de 3 casas.
-- [ ] **Ciclo 4 — só vale para o mesmo material e unidade**
+- [x] **Ciclo 4 — só vale para o mesmo material e unidade**
 ```python
 def deve_atender_somente_o_mesmo_material_e_a_mesma_unidade():
     rolo = ConversaoUnidade(TECIDO, ROLO, "1", "50")
@@ -169,21 +169,21 @@ def deve_atender_somente_o_mesmo_material_e_a_mesma_unidade():
     assert rolo.atende(TECIDO, 3) is False
     assert rolo.atende(9, ROLO) is False
 ```
-- [ ] **Ciclo 5 — equivalência inválida**
+- [x] **Ciclo 5 — equivalência inválida**
 ```python
 @pytest.mark.parametrize("compra,estoque", [("0", "50"), ("1", "0"), ("-1", "50")])
 def nao_deve_aceitar_equivalencia_zero_ou_negativa(compra, estoque):
     with pytest.raises(QuantidadeInvalidaError):
         ConversaoUnidade(TECIDO, ROLO, compra, estoque)
 ```
-- [ ] **Ciclo 6 — converter quantidade inválida**
+- [x] **Ciclo 6 — converter quantidade inválida**
 ```python
 @pytest.mark.parametrize("qtd", ["0", "-2"])
 def nao_deve_converter_quantidade_zero_ou_negativa(qtd):
     with pytest.raises(QuantidadeInvalidaError):
         ConversaoUnidade(TECIDO, ROLO, "1", "50").converter(qtd)
 ```
-- [ ] **Ciclo 7 — alterar a equivalência com a mesma validação**
+- [x] **Ciclo 7 — alterar a equivalência com a mesma validação**
 ```python
 def deve_alterar_equivalencia_validando_de_novo():
     rolo = ConversaoUnidade(TECIDO, ROLO, "1", "50")
@@ -193,7 +193,7 @@ def deve_alterar_equivalencia_validando_de_novo():
         rolo.alterar("0", "25")
     assert rolo.fator() == Decimal("25.000000")
 ```
-- [ ] **Refactor provável:** construtor e `alterar` validando no mesmo método privado. Commit `[REFACTOR] construtor e alterar usam a mesma validação`.
+- [x] **Refactor provável:** construtor e `alterar` validando no mesmo método privado. Commit `[REFACTOR] construtor e alterar usam a mesma validação`.
 
 ---
 
@@ -208,30 +208,30 @@ def deve_alterar_equivalencia_validando_de_novo():
 
 Nos testes: `AZUL = 10` (variante), `TECIDO = 1`, `METRO = 1`, `ROLO = 2`, fábrica `item_em_metro(qtd, preco)` (unidades iguais) e `item_em_rolo(qtd, preco, conversao)`.
 
-- [ ] **Ciclo 1 — total do item**
+- [x] **Ciclo 1 — total do item**
 ```python
 def deve_calcular_total_do_item():
     assert item_em_metro("3", "7.50").total() == Decimal("22.50")
 ```
-- [ ] **Ciclo 2 — entrada igual à compra quando a unidade é a mesma**
+- [x] **Ciclo 2 — entrada igual à compra quando a unidade é a mesma**
 ```python
 def deve_entrar_a_mesma_quantidade_quando_unidades_sao_iguais():
     assert item_em_metro("3", "7.50").qtd_entrada_estoque == Decimal("3.000")
 ```
-- [ ] **Ciclo 3 — entrada convertida**
+- [x] **Ciclo 3 — entrada convertida**
 ```python
 def deve_converter_a_entrada_quando_comprou_em_rolo():
     item = item_em_rolo("2", "80", ConversaoUnidade(TECIDO, ROLO, "1", "20"))
     assert item.qtd_entrada_estoque == Decimal("40.000")
     assert item.total() == Decimal("160.00")
 ```
-- [ ] **Ciclo 4 — custo unitário de entrada**
+- [x] **Ciclo 4 — custo unitário de entrada**
 ```python
 def deve_calcular_custo_por_metro_que_entrou():
     item = item_em_rolo("2", "80", ConversaoUnidade(TECIDO, ROLO, "1", "20"))
     assert item.custo_unitario_entrada() == Decimal("4.00")
 ```
-- [ ] **Ciclo 5 — histórico não muda**
+- [x] **Ciclo 5 — histórico não muda**
 ```python
 def nao_deve_mudar_a_entrada_quando_a_conversao_muda_depois():
     rolo = ConversaoUnidade(TECIDO, ROLO, "1", "20")
@@ -240,13 +240,13 @@ def nao_deve_mudar_a_entrada_quando_a_conversao_muda_depois():
     assert item.qtd_entrada_estoque == Decimal("40.000")
 ```
 Este passa logo de cara se a entrada já é guardada no construtor: rodar e **confirmar que passa**, commitar como `[GREEN] teste confirma que a compra antiga não muda com a conversão nova` (sem RED, porque o comportamento já existia — registrar isso no diário como exemplo de teste de regressão).
-- [ ] **Ciclo 6 — falta conversão**
+- [x] **Ciclo 6 — falta conversão**
 ```python
 def nao_deve_aceitar_unidade_diferente_sem_conversao():
     with pytest.raises(ConversaoAusenteError):
         item_em_rolo("2", "80", None)
 ```
-- [ ] **Ciclo 7 — conversão de outro material ou unidade**
+- [x] **Ciclo 7 — conversão de outro material ou unidade**
 ```python
 @pytest.mark.parametrize("conversao", [
     ConversaoUnidade(9, ROLO, "1", "20"),
@@ -256,7 +256,7 @@ def nao_deve_aceitar_conversao_que_nao_e_deste_material_e_unidade(conversao):
     with pytest.raises(ConversaoIncompativelError):
         item_em_rolo("2", "80", conversao)
 ```
-- [ ] **Ciclo 8 — quantidade e preço**
+- [x] **Ciclo 8 — quantidade e preço**
 ```python
 def nao_deve_aceitar_preco_negativo_nem_quantidade_zero():
     with pytest.raises(ValorInvalidoError):
@@ -281,14 +281,14 @@ Preço zero é permitido (brinde do fornecedor).
 
 Nos testes: fixture `compra()` com `fornecedor_id=1, usuario_id=1, data=datetime(2026, 9, 18, 17, 0, tzinfo=timezone.utc)`.
 
-- [ ] **Ciclo 1** `deve_comecar_como_rascunho_sem_itens`: `confirmada is False`, `itens == ()`, `total() == Decimal("0.00")`.
-- [ ] **Ciclo 2** `deve_somar_os_totais_dos_itens`: itens de R$ 160,00 e R$ 22,50 → `total() == Decimal("182.50")`, `len(itens) == 2`.
-- [ ] **Ciclo 3** `deve_editar_o_item_na_posicao`: `editar_item(0, item_em_metro("1", "10"))` → `itens[0]` é o novo; `total() == Decimal("32.50")`.
-- [ ] **Ciclo 4** `deve_remover_item_e_ajustar_o_total`: com os dois itens, `remover_item(1)` → `total() == Decimal("160.00")`.
-- [ ] **Ciclo 5** `deve_confirmar_compra_com_itens`: `confirmar()` → `confirmada is True`.
-- [ ] **Ciclo 6** `nao_deve_confirmar_compra_sem_itens` → `CompraSemItensError`.
-- [ ] **Ciclo 7** `nao_deve_mexer_em_compra_confirmada`: depois de confirmar, `adicionar_item`, `editar_item(0, …)`, `remover_item(0)` e `confirmar()` levantam `CompraConfirmadaError`; `total()` continua o mesmo.
-- [ ] **Ciclo 8** `nao_deve_aceitar_posicao_que_nao_existe` (Review Focus 3):
+- [x] **Ciclo 1** `deve_comecar_como_rascunho_sem_itens`: `confirmada is False`, `itens == ()`, `total() == Decimal("0.00")`.
+- [x] **Ciclo 2** `deve_somar_os_totais_dos_itens`: itens de R$ 160,00 e R$ 22,50 → `total() == Decimal("182.50")`, `len(itens) == 2`.
+- [x] **Ciclo 3** `deve_editar_o_item_na_posicao`: `editar_item(0, item_em_metro("1", "10"))` → `itens[0]` é o novo; `total() == Decimal("32.50")`.
+- [x] **Ciclo 4** `deve_remover_item_e_ajustar_o_total`: com os dois itens, `remover_item(1)` → `total() == Decimal("160.00")`.
+- [x] **Ciclo 5** `deve_confirmar_compra_com_itens`: `confirmar()` → `confirmada is True`.
+- [x] **Ciclo 6** `nao_deve_confirmar_compra_sem_itens` → `CompraSemItensError`.
+- [x] **Ciclo 7** `nao_deve_mexer_em_compra_confirmada`: depois de confirmar, `adicionar_item`, `editar_item(0, …)`, `remover_item(0)` e `confirmar()` levantam `CompraConfirmadaError`; `total()` continua o mesmo.
+- [x] **Ciclo 8** `nao_deve_aceitar_posicao_que_nao_existe` (Review Focus 3):
 ```python
 @pytest.mark.parametrize("posicao", [5, -1])
 def nao_deve_aceitar_posicao_que_nao_existe(compra, posicao):
@@ -299,7 +299,7 @@ def nao_deve_aceitar_posicao_que_nao_existe(compra, posicao):
         compra.editar_item(posicao, item_em_metro("1", "10"))
     assert len(compra.itens) == 1
 ```
-- [ ] **Refactor provável:** `_exigir_rascunho()` e `_exigir_posicao(posicao)` privados.
+- [x] **Refactor provável:** `_exigir_rascunho()` e `_exigir_posicao(posicao)` privados.
 
 ---
 
@@ -314,7 +314,7 @@ def nao_deve_aceitar_posicao_que_nao_existe(compra, posicao):
 
 Média ponderada (entrada e retorno): `dinheiro((saldo × custo_medio + valor_que_entra) ÷ (saldo + qtd))`, onde `valor_que_entra` é `custo_total` na entrada e `qtd × custo_unitario` no retorno.
 
-- [ ] **Ciclo 1** `deve_comecar_com_saldo_e_custo_iniciais`:
+- [x] **Ciclo 1** `deve_comecar_com_saldo_e_custo_iniciais`:
 ```python
 estoque = EstoqueVariante("10", "7", "5")
 assert estoque.saldo == Decimal("10.000")
@@ -322,10 +322,10 @@ assert estoque.custo_medio == Decimal("7.00")
 with pytest.raises(AttributeError):
     estoque.saldo = Decimal("99")
 ```
-- [ ] **Ciclo 2** `deve_recalcular_media_ponderada_quando_entra_compra`: `EstoqueVariante("10", "7")`, `registrar_entrada("40", "160")` → `saldo == Decimal("50.000")`, `custo_medio == Decimal("4.60")`.
-- [ ] **Ciclo 3** `deve_usar_o_custo_da_compra_quando_estoque_estava_vazio` (Review Focus 4): `EstoqueVariante()`, `registrar_entrada("40", "160")` → `custo_medio == Decimal("4.00")`.
-- [ ] **Ciclo 4** `deve_baixar_saldo_e_devolver_custo_vigente_na_saida`: `EstoqueVariante("50", "4.60").registrar_saida("3") == Decimal("4.60")`; `saldo == Decimal("47.000")`; `custo_medio == Decimal("4.60")`.
-- [ ] **Ciclo 5** `nao_deve_sair_mais_que_o_saldo`:
+- [x] **Ciclo 2** `deve_recalcular_media_ponderada_quando_entra_compra`: `EstoqueVariante("10", "7")`, `registrar_entrada("40", "160")` → `saldo == Decimal("50.000")`, `custo_medio == Decimal("4.60")`.
+- [x] **Ciclo 3** `deve_usar_o_custo_da_compra_quando_estoque_estava_vazio` (Review Focus 4): `EstoqueVariante()`, `registrar_entrada("40", "160")` → `custo_medio == Decimal("4.00")`.
+- [x] **Ciclo 4** `deve_baixar_saldo_e_devolver_custo_vigente_na_saida`: `EstoqueVariante("50", "4.60").registrar_saida("3") == Decimal("4.60")`; `saldo == Decimal("47.000")`; `custo_medio == Decimal("4.60")`.
+- [x] **Ciclo 5** `nao_deve_sair_mais_que_o_saldo`:
 ```python
 estoque = EstoqueVariante("2", "5")
 with pytest.raises(SaldoInsuficienteError) as erro:
@@ -333,8 +333,8 @@ with pytest.raises(SaldoInsuficienteError) as erro:
 assert erro.value.disponivel == Decimal("2.000")
 assert estoque.saldo == Decimal("2.000")
 ```
-- [ ] **Ciclo 6** `deve_permitir_sair_todo_o_saldo`: `EstoqueVariante("2", "5").registrar_saida("2")` → `saldo == Decimal("0.000")`.
-- [ ] **Ciclo 7** `deve_devolver_ao_saldo_e_recalcular_media_no_retorno` (Review Focus 4):
+- [x] **Ciclo 6** `deve_permitir_sair_todo_o_saldo`: `EstoqueVariante("2", "5").registrar_saida("2")` → `saldo == Decimal("0.000")`.
+- [x] **Ciclo 7** `deve_devolver_ao_saldo_e_recalcular_media_no_retorno` (Review Focus 4):
 ```python
 estoque = EstoqueVariante("47", "4.60")
 estoque.registrar_retorno("0.5", "4.60")
@@ -349,9 +349,9 @@ vazio = EstoqueVariante()
 vazio.registrar_retorno("1", "4.60")
 assert (vazio.saldo, vazio.custo_medio) == (Decimal("1.000"), Decimal("4.60"))
 ```
-- [ ] **Ciclo 8** `deve_avisar_quando_abaixo_do_minimo`: `EstoqueVariante("4", "1", "5").abaixo_do_minimo() is True`; `EstoqueVariante("5", "1", "5").abaixo_do_minimo() is False`.
-- [ ] **Ciclo 9** `nao_deve_aceitar_quantidade_ou_valor_invalido`: `registrar_entrada("0", "1")`, `registrar_saida("-1")`, `registrar_retorno("0", "1")` → `QuantidadeInvalidaError`; `registrar_entrada("1", "-5")` e `EstoqueVariante("-1")` → `ValorInvalidoError`.
-- [ ] **Ciclo 10** `deve_guardar_o_id_da_variante`: `EstoqueVariante("1", "1", variante_id=10).variante_id == 10`; sem informar → `None`.
+- [x] **Ciclo 8** `deve_avisar_quando_abaixo_do_minimo`: `EstoqueVariante("4", "1", "5").abaixo_do_minimo() is True`; `EstoqueVariante("5", "1", "5").abaixo_do_minimo() is False`.
+- [x] **Ciclo 9** `nao_deve_aceitar_quantidade_ou_valor_invalido`: `registrar_entrada("0", "1")`, `registrar_saida("-1")`, `registrar_retorno("0", "1")` → `QuantidadeInvalidaError`; `registrar_entrada("1", "-5")` e `EstoqueVariante("-1")` → `ValorInvalidoError`.
+- [x] **Ciclo 10** `deve_guardar_o_id_da_variante`: `EstoqueVariante("1", "1", variante_id=10).variante_id == 10`; sem informar → `None`.
 
 ---
 
@@ -366,12 +366,12 @@ assert (vazio.saldo, vazio.custo_medio) == (Decimal("1.000"), Decimal("4.60"))
   - `Cor(nome: str, codigo_hex: str | None = None)` (herda `Arquivavel`) com `nome`, `codigo_hex` (maiúsculo ou `None`), `rotulo() -> str`, `chave() -> str` (nome em minúsculas, usado para comparar). Exceção `CorInvalidaError`.
   - `Categoria(nome: str, tipo: str)` com `nome`, `tipo`; constantes `Categoria.MATERIAL = "M"`, `Categoria.PRODUCAO = "P"`. Exceção `CategoriaIncompativelError` (usada pelas Tarefas 7 e 8).
 
-- [ ] **Ciclo 1** `deve_guardar_nome_limpo_e_hex_em_maiusculas`: `Cor("  Azul ", "#315a81")` → `nome == "Azul"`, `codigo_hex == "#315A81"`, `rotulo() == "Azul"`.
-- [ ] **Ciclo 2** `deve_aceitar_cor_sem_hex`: `Cor("Branco").codigo_hex is None`.
-- [ ] **Ciclo 3** `nao_deve_aceitar_hex_fora_do_formato`: parametrizado com `"azul"`, `"#12345"`, `"#GGGGGG"`, `"315A81"` → `CorInvalidaError`. Regex `^#[0-9A-Fa-f]{6}$`.
-- [ ] **Ciclo 4** `nao_deve_aceitar_nome_vazio`: `Cor("   ")` e `Categoria("", "M")` → `ValorObrigatorioError`.
-- [ ] **Ciclo 5** `deve_criar_categoria_de_material_ou_producao`: `Categoria(" Tecido ", "M")` → `nome == "Tecido"`, `tipo == "M"`; `Categoria("Saia", "X")` → `ValorInvalidoError`.
-- [ ] **Ciclo 6** `deve_arquivar_e_reativar_cor`: `ativo` começa `True`, `arquivar()` → `False`, `reativar()` → `True`.
+- [x] **Ciclo 1** `deve_guardar_nome_limpo_e_hex_em_maiusculas`: `Cor("  Azul ", "#315a81")` → `nome == "Azul"`, `codigo_hex == "#315A81"`, `rotulo() == "Azul"`.
+- [x] **Ciclo 2** `deve_aceitar_cor_sem_hex`: `Cor("Branco").codigo_hex is None`.
+- [x] **Ciclo 3** `nao_deve_aceitar_hex_fora_do_formato`: parametrizado com `"azul"`, `"#12345"`, `"#GGGGGG"`, `"315A81"` → `CorInvalidaError`. Regex `^#[0-9A-Fa-f]{6}$`.
+- [x] **Ciclo 4** `nao_deve_aceitar_nome_vazio`: `Cor("   ")` e `Categoria("", "M")` → `ValorObrigatorioError`.
+- [x] **Ciclo 5** `deve_criar_categoria_de_material_ou_producao`: `Categoria(" Tecido ", "M")` → `nome == "Tecido"`, `tipo == "M"`; `Categoria("Saia", "X")` → `ValorInvalidoError`.
+- [x] **Ciclo 6** `deve_arquivar_e_reativar_cor`: `ativo` começa `True`, `arquivar()` → `False`, `reativar()` → `True`.
 
 ---
 
@@ -386,13 +386,13 @@ assert (vazio.saldo, vazio.custo_medio) == (Decimal("1.000"), Decimal("4.60"))
 
 Nos testes: `TECIDO = Categoria("Tecido", "M")`, `SAIA = Categoria("Saia", "P")`, `METRO = 1`.
 
-- [ ] **Ciclo 1** `deve_criar_material_ativo_com_categoria_de_material`: `Material("Tecido Oxford", TECIDO, METRO)` → `nome == "Tecido Oxford"`, `ativo is True`, `cores() == []`.
-- [ ] **Ciclo 2** `nao_deve_aceitar_categoria_de_producao`: `Material("Tecido Oxford", SAIA, METRO)` → `CategoriaIncompativelError`.
-- [ ] **Ciclo 3** `deve_adicionar_cor_com_estoque_proprio`: `adicionar_cor(Cor("Azul"), "5", "10", "7")` devolve estoque com `saldo == Decimal("10.000")`, `custo_medio == Decimal("7.00")`, `qtd_estoque_minimo == Decimal("5.000")`; `cores() == ["Azul"]`.
-- [ ] **Ciclo 4** `nao_deve_repetir_a_mesma_cor_no_material` (Review Focus 5): `adicionar_cor(Cor("Azul"))` e depois `adicionar_cor(Cor(" azul "))` → `VarianteDuplicadaError`; `cores() == ["Azul"]`.
-- [ ] **Ciclo 5** `deve_manter_estoque_separado_por_cor`: com Azul (10 m) e Branco (0 m), `estoque_da_cor(Cor("Branco")).registrar_entrada("10", "20")` → Azul continua `Decimal("10.000")`, Branco `Decimal("10.000")`.
-- [ ] **Ciclo 6** `nao_deve_achar_estoque_de_cor_nao_cadastrada`: `estoque_da_cor(Cor("Verde"))` → `VarianteNaoEncontradaError`.
-- [ ] **Ciclo 7** `deve_arquivar_sem_perder_as_cores`: `arquivar()` → `ativo is False`, `cores() == ["Azul"]`.
+- [x] **Ciclo 1** `deve_criar_material_ativo_com_categoria_de_material`: `Material("Tecido Oxford", TECIDO, METRO)` → `nome == "Tecido Oxford"`, `ativo is True`, `cores() == []`.
+- [x] **Ciclo 2** `nao_deve_aceitar_categoria_de_producao`: `Material("Tecido Oxford", SAIA, METRO)` → `CategoriaIncompativelError`.
+- [x] **Ciclo 3** `deve_adicionar_cor_com_estoque_proprio`: `adicionar_cor(Cor("Azul"), "5", "10", "7")` devolve estoque com `saldo == Decimal("10.000")`, `custo_medio == Decimal("7.00")`, `qtd_estoque_minimo == Decimal("5.000")`; `cores() == ["Azul"]`.
+- [x] **Ciclo 4** `nao_deve_repetir_a_mesma_cor_no_material` (Review Focus 5): `adicionar_cor(Cor("Azul"))` e depois `adicionar_cor(Cor(" azul "))` → `VarianteDuplicadaError`; `cores() == ["Azul"]`.
+- [x] **Ciclo 5** `deve_manter_estoque_separado_por_cor`: com Azul (10 m) e Branco (0 m), `estoque_da_cor(Cor("Branco")).registrar_entrada("10", "20")` → Azul continua `Decimal("10.000")`, Branco `Decimal("10.000")`.
+- [x] **Ciclo 6** `nao_deve_achar_estoque_de_cor_nao_cadastrada`: `estoque_da_cor(Cor("Verde"))` → `VarianteNaoEncontradaError`.
+- [x] **Ciclo 7** `deve_arquivar_sem_perder_as_cores`: `arquivar()` → `ativo is False`, `cores() == ["Azul"]`.
 
 ---
 
@@ -410,13 +410,13 @@ Nos testes: `TECIDO = Categoria("Tecido", "M")`, `SAIA = Categoria("Saia", "P")`
 
 Nos testes: `SAIA = Categoria("Saia", "P")`, `T1 = datetime(2026, 9, 18, 17, 15, tzinfo=timezone.utc)`, `T2 = T1 + timedelta(minutes=5)`; fixture `saia()` = `Producao("Saia midi", SAIA, usuario_id=1, vl_mao_obra="60", vl_venda="220")`; fixture `azul()` = `EstoqueVariante("50", "4.60", variante_id=10)`.
 
-- [ ] **Ciclo 1** `deve_criar_producao_sem_pasta_e_so_com_categoria_de_producao`: `saia().pasta_id is None`; `Producao("Saia midi", Categoria("Tecido", "M"), 1)` → `CategoriaIncompativelError`; `Producao("  ", SAIA, 1)` → `ValorObrigatorioError`.
-- [ ] **Ciclo 2** `deve_registrar_uso_com_o_custo_medio_vigente`: `uso = saia.registrar_uso(azul, "3", T1)` → `uso.tipo == "U"`, `uso.variante_id == 10`, `uso.quantidade == Decimal("3.000")`, `uso.custo_unitario == Decimal("4.60")`, `uso.id_uso_origem is None`; `azul.saldo == Decimal("47.000")`. Estoque sem `variante_id` → `ValorObrigatorioError`.
-- [ ] **Ciclo 3** `deve_manter_o_custo_do_uso_quando_chega_compra_nova`: depois do uso, `azul.registrar_entrada("10", "100")` → `uso.custo_unitario == Decimal("4.60")`.
-- [ ] **Ciclo 4** `nao_deve_usar_mais_que_o_saldo`: `EstoqueVariante("2", "5", variante_id=10)`, uso de `"2.5"` → `SaldoInsuficienteError`; `saia.movimentacoes() == ()`.
-- [ ] **Ciclo 5** `deve_registrar_retorno_apontando_para_o_uso`: `r = saia.registrar_retorno(uso.id, azul, "0.5", T2)` → `r.tipo == "R"`, `r.id_uso_origem == uso.id`, `r.custo_unitario == Decimal("4.60")`; `azul.saldo == Decimal("47.500")`; `len(saia.movimentacoes()) == 2` e o uso continua lá.
-- [ ] **Ciclo 6** `deve_calcular_quanto_ainda_pode_voltar`: depois do retorno de 0,5 → `quantidade_devolvivel(uso.id) == Decimal("2.500")`.
-- [ ] **Ciclo 7** `nao_deve_devolver_mais_que_o_devolvivel` (Review Focus 2):
+- [x] **Ciclo 1** `deve_criar_producao_sem_pasta_e_so_com_categoria_de_producao`: `saia().pasta_id is None`; `Producao("Saia midi", Categoria("Tecido", "M"), 1)` → `CategoriaIncompativelError`; `Producao("  ", SAIA, 1)` → `ValorObrigatorioError`.
+- [x] **Ciclo 2** `deve_registrar_uso_com_o_custo_medio_vigente`: `uso = saia.registrar_uso(azul, "3", T1)` → `uso.tipo == "U"`, `uso.variante_id == 10`, `uso.quantidade == Decimal("3.000")`, `uso.custo_unitario == Decimal("4.60")`, `uso.id_uso_origem is None`; `azul.saldo == Decimal("47.000")`. Estoque sem `variante_id` → `ValorObrigatorioError`.
+- [x] **Ciclo 3** `deve_manter_o_custo_do_uso_quando_chega_compra_nova`: depois do uso, `azul.registrar_entrada("10", "100")` → `uso.custo_unitario == Decimal("4.60")`.
+- [x] **Ciclo 4** `nao_deve_usar_mais_que_o_saldo`: `EstoqueVariante("2", "5", variante_id=10)`, uso de `"2.5"` → `SaldoInsuficienteError`; `saia.movimentacoes() == ()`.
+- [x] **Ciclo 5** `deve_registrar_retorno_apontando_para_o_uso`: `r = saia.registrar_retorno(uso.id, azul, "0.5", T2)` → `r.tipo == "R"`, `r.id_uso_origem == uso.id`, `r.custo_unitario == Decimal("4.60")`; `azul.saldo == Decimal("47.500")`; `len(saia.movimentacoes()) == 2` e o uso continua lá.
+- [x] **Ciclo 6** `deve_calcular_quanto_ainda_pode_voltar`: depois do retorno de 0,5 → `quantidade_devolvivel(uso.id) == Decimal("2.500")`.
+- [x] **Ciclo 7** `nao_deve_devolver_mais_que_o_devolvivel` (Review Focus 2):
 ```python
 uso = saia.registrar_uso(azul, "3", T1)
 with pytest.raises(RetornoExcedeUsoError):
@@ -427,7 +427,7 @@ with pytest.raises(RetornoExcedeUsoError):
 assert azul.saldo == Decimal("49.500")
 assert len(saia.movimentacoes()) == 2
 ```
-- [ ] **Ciclo 8** `deve_devolver_com_o_custo_do_uso_de_origem` (D05 com dois custos diferentes):
+- [x] **Ciclo 8** `deve_devolver_com_o_custo_do_uso_de_origem` (D05 com dois custos diferentes):
 ```python
 azul = EstoqueVariante("10", "4", variante_id=10)
 uso1 = saia.registrar_uso(azul, "2", T1)          # 4,00
@@ -439,8 +439,8 @@ assert retorno.custo_unitario == Decimal("4.00")
 assert azul.saldo == Decimal("17.000")
 assert azul.custo_medio == Decimal("7.13")        # (16×7,33 + 1×4,00) ÷ 17
 ```
-- [ ] **Ciclo 9** `nao_deve_devolver_uso_inexistente_nem_retorno`: `registrar_retorno("nao-existe", …)` → `UsoNaoEncontradoError`; usar o `id` de um **retorno** como origem → `UsoNaoEncontradoError`.
-- [ ] **Ciclo 10** `nao_deve_devolver_para_outra_cor`: uso no Azul (`variante_id=10`), retorno passando `EstoqueVariante("5", "3", variante_id=11)` → `VarianteDiferenteError`; os dois saldos ficam como estavam.
+- [x] **Ciclo 9** `nao_deve_devolver_uso_inexistente_nem_retorno`: `registrar_retorno("nao-existe", …)` → `UsoNaoEncontradoError`; usar o `id` de um **retorno** como origem → `UsoNaoEncontradoError`.
+- [x] **Ciclo 10** `nao_deve_devolver_para_outra_cor`: uso no Azul (`variante_id=10`), retorno passando `EstoqueVariante("5", "3", variante_id=11)` → `VarianteDiferenteError`; os dois saldos ficam como estavam.
 
 Regra de ouro desta tarefa: **validar tudo antes de mexer no estoque**, para que um erro nunca deixe o saldo alterado pela metade.
 
@@ -457,11 +457,11 @@ Regra de ouro desta tarefa: **validar tudo antes de mexer no estoque**, para que
 
 Nos testes: `CONCLUSAO = date(2026, 10, 20)`.
 
-- [ ] **Ciclo 1** `deve_calcular_os_custos_da_saia_midi`: uso de 3 m e retorno de 0,5 m no Azul a R$ 4,60 → `custo_materiais() == Decimal("11.50")`, `custo_total() == Decimal("71.50")`.
-- [ ] **Ciclo 2** `deve_ter_custo_so_de_mao_de_obra_sem_movimentacoes`: `custo_materiais() == Decimal("0.00")`, `custo_total() == Decimal("60.00")`.
-- [ ] **Ciclo 3** `deve_bloquear_uso_e_retorno_depois_de_concluir`: `concluir(CONCLUSAO)` → `concluida is True`, `dt_finalizacao == CONCLUSAO`; `registrar_uso` e `registrar_retorno` → `ProducaoConcluidaError`; `azul.saldo` inalterado.
-- [ ] **Ciclo 4** `nao_deve_concluir_duas_vezes` → `ProducaoConcluidaError`.
-- [ ] **Ciclo 5** `deve_reabrir_com_motivo_e_guardar_historico`:
+- [x] **Ciclo 1** `deve_calcular_os_custos_da_saia_midi`: uso de 3 m e retorno de 0,5 m no Azul a R$ 4,60 → `custo_materiais() == Decimal("11.50")`, `custo_total() == Decimal("71.50")`.
+- [x] **Ciclo 2** `deve_ter_custo_so_de_mao_de_obra_sem_movimentacoes`: `custo_materiais() == Decimal("0.00")`, `custo_total() == Decimal("60.00")`.
+- [x] **Ciclo 3** `deve_bloquear_uso_e_retorno_depois_de_concluir`: `concluir(CONCLUSAO)` → `concluida is True`, `dt_finalizacao == CONCLUSAO`; `registrar_uso` e `registrar_retorno` → `ProducaoConcluidaError`; `azul.saldo` inalterado.
+- [x] **Ciclo 4** `nao_deve_concluir_duas_vezes` → `ProducaoConcluidaError`.
+- [x] **Ciclo 5** `deve_reabrir_com_motivo_e_guardar_historico`:
 ```python
 saia.concluir(CONCLUSAO)
 evento = saia.reabrir("Cliente pediu ajuste na barra", usuario_id=1, quando=T2)
@@ -473,10 +473,10 @@ saia.concluir(date(2026, 10, 25))
 saia.reabrir("Trocar botões", usuario_id=1, quando=T2)
 assert [e.motivo for e in saia.historico_reaberturas()] == ["Cliente pediu ajuste na barra", "Trocar botões"]
 ```
-- [ ] **Ciclo 6** `nao_deve_reabrir_sem_motivo_ou_sem_estar_concluida`: produção em andamento → `ProducaoNaoConcluidaError`; concluída com motivo `"   "` → `ValorObrigatorioError` e continua concluída.
-- [ ] **Ciclo 7** `deve_publicar_so_producao_concluida`: em andamento → `ProducaoNaoConcluidaError`; concluída → `publicar_na_vitrine()` → `publicada is True`; `retirar_da_vitrine()` → `False`.
-- [ ] **Ciclo 8** `deve_tirar_da_vitrine_quando_reabrir` (decisão do plano): concluída e publicada, `reabrir(...)` → `publicada is False`.
-- [ ] **Ciclo 9** `deve_expor_so_os_dados_publicos`:
+- [x] **Ciclo 6** `nao_deve_reabrir_sem_motivo_ou_sem_estar_concluida`: produção em andamento → `ProducaoNaoConcluidaError`; concluída com motivo `"   "` → `ValorObrigatorioError` e continua concluída.
+- [x] **Ciclo 7** `deve_publicar_so_producao_concluida`: em andamento → `ProducaoNaoConcluidaError`; concluída → `publicar_na_vitrine()` → `publicada is True`; `retirar_da_vitrine()` → `False`.
+- [x] **Ciclo 8** `deve_tirar_da_vitrine_quando_reabrir` (decisão do plano): concluída e publicada, `reabrir(...)` → `publicada is False`.
+- [x] **Ciclo 9** `deve_expor_so_os_dados_publicos`:
 ```python
 dados = saia.dados_publicos()
 assert dados == {"nome_peca": "Saia midi", "categoria": "Saia",
@@ -491,8 +491,8 @@ Imagens entram na Fase 2 (vêm de `Imagem_Producao`).
 **Files:**
 - Modify: `docs/CONTEXTO.md` (seções 4, 7 e 10), `README.md` (tabela de resultados), `docs/requisitos.md` (se alguma assinatura mudou durante os refactors)
 
-- [ ] Rodar `pytest apps -v` (na máquina local, com Django, rodar `pytest` inteiro) → todos passando.
-- [ ] Rodar `pytest apps --cov=apps --cov-report=term-missing` na máquina local → anotar cobertura dos `dominio.py` (meta: **≥ 95%**).
-- [ ] Anotar no CONTEXTO os "bugs que os testes pegaram" durante a fase (vira material da `analise-beneficios.md`).
-- [ ] Atualizar o README (número de testes e cobertura) e commitar: `Fecha a fase 1: domínio completo e diário atualizado`.
+- [x] Rodar `pytest apps -v` (na máquina local, com Django, rodar `pytest` inteiro) → todos passando.
+- [x] Rodar `pytest apps --cov=apps --cov-report=term-missing` na máquina local → anotar cobertura dos `dominio.py` (meta: **≥ 95%**).
+- [x] Anotar no CONTEXTO os "bugs que os testes pegaram" durante a fase (vira material da `analise-beneficios.md`).
+- [x] Atualizar o README (número de testes e cobertura) e commitar: `Fecha a fase 1: domínio completo e diário atualizado`.
 - [ ] Escrever o plano detalhado da Fase 2 a partir do roteiro.

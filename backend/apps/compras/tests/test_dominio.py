@@ -1,0 +1,175 @@
+"""
+Testes da compra: cada item sabe quanto custou e quanto entra no estoque,
+e a compra junta os itens até ser confirmada.
+"""
+
+from datetime import datetime, timezone
+from decimal import Decimal
+
+import pytest
+
+from apps.comum.erros import QuantidadeInvalidaError, ValorInvalidoError
+from apps.compras.dominio import (
+    Compra,
+    CompraConfirmadaError,
+    CompraSemItensError,
+    ConversaoAusenteError,
+    ConversaoIncompativelError,
+    ItemCompra,
+    ItemNaoEncontradoError,
+)
+from apps.conversoes.dominio import ConversaoUnidade
+
+AZUL = 10  # variante Tecido Oxford Azul
+TECIDO = 1
+METRO = 1
+ROLO = 2
+
+
+def item_em_metro(qtd, preco):
+    """Comprou na mesma unidade em que guarda: metro."""
+    return ItemCompra(AZUL, TECIDO, METRO, METRO, qtd, preco)
+
+
+def item_em_rolo(qtd, preco, conversao):
+    """Comprou em rolo, guarda em metro."""
+    return ItemCompra(AZUL, TECIDO, ROLO, METRO, qtd, preco, conversao)
+
+
+def deve_calcular_total_do_item():
+    assert item_em_metro("3", "7.50").total() == Decimal("22.50")
+
+
+def deve_entrar_a_mesma_quantidade_quando_unidades_sao_iguais():
+    assert item_em_metro("3", "7.50").qtd_entrada_estoque == Decimal("3.000")
+
+
+# Exemplo da Referência SQL: 2 rolos a R$ 80, com 1 rolo = 20 m.
+def deve_converter_a_entrada_quando_comprou_em_rolo():
+    item = item_em_rolo("2", "80", ConversaoUnidade(TECIDO, ROLO, "1", "20"))
+    assert item.qtd_entrada_estoque == Decimal("40.000")
+    assert item.total() == Decimal("160.00")
+
+
+# R$ 160 ÷ 40 m = R$ 4,00 por metro que entrou.
+def deve_calcular_custo_por_metro_que_entrou():
+    item = item_em_rolo("2", "80", ConversaoUnidade(TECIDO, ROLO, "1", "20"))
+    assert item.custo_unitario_entrada() == Decimal("4.00")
+
+
+# A quantidade que entrou é histórico: corrigir a conversão hoje não muda a compra de ontem.
+def nao_deve_mudar_a_entrada_quando_a_conversao_muda_depois():
+    rolo = ConversaoUnidade(TECIDO, ROLO, "1", "20")
+    item = item_em_rolo("2", "80", rolo)
+    rolo.alterar("1", "25")
+    assert item.qtd_entrada_estoque == Decimal("40.000")
+
+
+def nao_deve_aceitar_unidade_diferente_sem_conversao():
+    with pytest.raises(ConversaoAusenteError):
+        item_em_rolo("2", "80", None)
+
+
+# Conversão do rolo de outro material, ou do pacote do tecido, não serve para o rolo do tecido.
+@pytest.mark.parametrize("conversao", [
+    ConversaoUnidade(9, ROLO, "1", "20"),
+    ConversaoUnidade(TECIDO, 3, "1", "20"),
+])
+def nao_deve_aceitar_conversao_que_nao_e_deste_material_e_unidade(conversao):
+    with pytest.raises(ConversaoIncompativelError):
+        item_em_rolo("2", "80", conversao)
+
+
+# Preço zero pode (brinde do fornecedor); negativo não. Quantidade tem que ser maior que zero.
+def nao_deve_aceitar_preco_negativo_nem_quantidade_zero():
+    with pytest.raises(ValorInvalidoError):
+        item_em_metro("1", "-1")
+    with pytest.raises(QuantidadeInvalidaError):
+        item_em_metro("0", "5")
+    assert item_em_metro("2", "0").custo_unitario_entrada() == Decimal("0.00")
+
+
+# ---------- Compra ----------
+
+
+@pytest.fixture
+def compra():
+    return Compra(fornecedor_id=1, usuario_id=1, data=datetime(2026, 9, 18, 17, 0, tzinfo=timezone.utc))
+
+
+def deve_comecar_como_rascunho_sem_itens(compra):
+    assert compra.confirmada is False
+    assert compra.itens == ()
+    assert compra.total() == Decimal("0.00")
+
+
+def com_dois_itens(compra):
+    """R$ 160,00 (2 rolos) + R$ 22,50 (3 m)."""
+    compra.adicionar_item(item_em_rolo("2", "80", ConversaoUnidade(TECIDO, ROLO, "1", "20")))
+    compra.adicionar_item(item_em_metro("3", "7.50"))
+    return compra
+
+
+def deve_somar_os_totais_dos_itens(compra):
+    com_dois_itens(compra)
+    assert len(compra.itens) == 2
+    assert compra.total() == Decimal("182.50")
+
+
+def deve_editar_o_item_na_posicao(compra):
+    com_dois_itens(compra)
+    novo = item_em_metro("1", "10")
+    compra.editar_item(0, novo)
+    assert compra.itens[0] is novo
+    assert compra.total() == Decimal("32.50")
+
+
+def deve_remover_item_e_ajustar_o_total(compra):
+    com_dois_itens(compra)
+    compra.remover_item(1)
+    assert compra.total() == Decimal("160.00")
+
+
+def deve_confirmar_compra_com_itens(compra):
+    com_dois_itens(compra).confirmar()
+    assert compra.confirmada is True
+
+
+def nao_deve_confirmar_compra_sem_itens(compra):
+    with pytest.raises(CompraSemItensError):
+        compra.confirmar()
+    assert compra.confirmada is False
+
+
+# Depois de confirmada, a compra já mexeu no estoque: não dá mais para mudar nada nela.
+def nao_deve_mexer_em_compra_confirmada(compra):
+    com_dois_itens(compra).confirmar()
+    with pytest.raises(CompraConfirmadaError):
+        compra.adicionar_item(item_em_metro("1", "10"))
+    with pytest.raises(CompraConfirmadaError):
+        compra.editar_item(0, item_em_metro("1", "10"))
+    with pytest.raises(CompraConfirmadaError):
+        compra.remover_item(0)
+    with pytest.raises(CompraConfirmadaError):
+        compra.confirmar()
+    assert compra.total() == Decimal("182.50")
+
+
+# -1 é o caso traiçoeiro: no Python ele apagaria o último item sem avisar ninguém.
+@pytest.mark.parametrize("posicao", [5, -1])
+def nao_deve_aceitar_posicao_que_nao_existe(compra, posicao):
+    compra.adicionar_item(item_em_metro("1", "10"))
+    with pytest.raises(ItemNaoEncontradoError):
+        compra.remover_item(posicao)
+    with pytest.raises(ItemNaoEncontradoError):
+        compra.editar_item(posicao, item_em_metro("1", "10"))
+    assert len(compra.itens) == 1
+
+
+# Mesmo bug que apareceu no estoque: quantidade que arredonda para zero (na compra
+# ou depois da conversão) faria o custo de entrada dividir por zero.
+def nao_deve_aceitar_item_que_entra_zero_no_estoque():
+    with pytest.raises(QuantidadeInvalidaError):
+        item_em_metro("0.0001", "5")
+    with pytest.raises(QuantidadeInvalidaError):
+        item_em_rolo("0.001", "80", ConversaoUnidade(TECIDO, ROLO, "3", "1"))

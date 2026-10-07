@@ -1,0 +1,61 @@
+"""
+Estoque de uma variante (material + cor): saldo e custo médio ponderado.
+
+Cada cor tem o seu: mexer no Azul não muda o Branco do mesmo tecido.
+"""
+
+from apps.comum.erros import ErroDeNegocio
+from apps.comum.numeros import dinheiro, exigir_nao_negativo, exigir_positivo, formatar, quantidade
+
+
+class SaldoInsuficienteError(ErroDeNegocio):
+    """Pediu mais material do que tem no estoque daquela cor."""
+
+    def __init__(self, disponivel):
+        self.disponivel = disponivel
+        super().__init__(f"Não tem material suficiente. Disponível: {formatar(disponivel)}.")
+
+
+class EstoqueVariante:
+    def __init__(self, qtd_inicial="0", vl_unitario_inicial="0", qtd_estoque_minimo="0", *, variante_id=None):
+        self.variante_id = variante_id
+        self._saldo = quantidade(exigir_nao_negativo(qtd_inicial, "quantidade inicial"))
+        self._custo_medio = dinheiro(exigir_nao_negativo(vl_unitario_inicial, "valor unitário inicial"))
+        self._qtd_estoque_minimo = quantidade(exigir_nao_negativo(qtd_estoque_minimo, "estoque mínimo"))
+
+    @property
+    def saldo(self):
+        return self._saldo
+
+    @property
+    def custo_medio(self):
+        return self._custo_medio
+
+    @property
+    def qtd_estoque_minimo(self):
+        return self._qtd_estoque_minimo
+
+    def abaixo_do_minimo(self):
+        return self._saldo < self._qtd_estoque_minimo
+
+    def registrar_entrada(self, qtd, custo_total):
+        qtd = exigir_positivo(quantidade(qtd), "quantidade")
+        self._somar_com_media_ponderada(qtd, exigir_nao_negativo(custo_total, "custo da compra"))
+
+    def registrar_saida(self, qtd):
+        qtd = exigir_positivo(quantidade(qtd), "quantidade")
+        if qtd > self._saldo:
+            raise SaldoInsuficienteError(self._saldo)
+        self._saldo = quantidade(self._saldo - qtd)
+        return self._custo_medio
+
+    def registrar_retorno(self, qtd, custo_unitario):
+        qtd = exigir_positivo(quantidade(qtd), "quantidade")
+        self._somar_com_media_ponderada(qtd, qtd * exigir_nao_negativo(custo_unitario, "custo do uso"))
+
+    def _somar_com_media_ponderada(self, qtd, valor_que_entra):
+        # (saldo × média + o que entra) ÷ (saldo + qtd). O saldo novo nunca é zero
+        # aqui, então estoque vazio não dá divisão por zero: a média vira o custo que entrou.
+        valor_em_estoque = self._saldo * self._custo_medio + valor_que_entra
+        self._saldo = quantidade(self._saldo + qtd)
+        self._custo_medio = dinheiro(valor_em_estoque / self._saldo)
