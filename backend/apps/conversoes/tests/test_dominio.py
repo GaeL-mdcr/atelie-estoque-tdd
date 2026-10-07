@@ -43,3 +43,9 @@ def deve_atender_somente_o_mesmo_material_e_a_mesma_unidade():
 def nao_deve_aceitar_equivalencia_zero_ou_negativa(compra, estoque):
     with pytest.raises(QuantidadeInvalidaError):
         ConversaoUnidade(TECIDO, ROLO, compra, estoque)
+
+
+@pytest.mark.parametrize("qtd", ["0", "-2"])
+def nao_deve_converter_quantidade_zero_ou_negativa(qtd):
+    with pytest.raises(QuantidadeInvalidaError):
+        ConversaoUnidade(TECIDO, ROLO, "1", "50").converter(qtd)
