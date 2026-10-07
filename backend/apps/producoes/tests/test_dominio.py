@@ -198,3 +198,15 @@ def nao_deve_reabrir_sem_motivo_ou_sem_estar_concluida(saia):
         saia.reabrir("   ", usuario_id=1, quando=T2)
     assert saia.concluida is True
     assert saia.historico_reaberturas() == ()
+
+
+# Vitrine é só para peça pronta, e a publicação é manual (RN-T17).
+def deve_publicar_so_producao_concluida(saia):
+    with pytest.raises(ProducaoNaoConcluidaError):
+        saia.publicar_na_vitrine()
+    assert saia.publicada is False
+    saia.concluir(CONCLUSAO)
+    saia.publicar_na_vitrine()
+    assert saia.publicada is True
+    saia.retirar_da_vitrine()
+    assert saia.publicada is False
