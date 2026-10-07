@@ -16,6 +16,7 @@ from apps.compras.dominio import (
     ConversaoAusenteError,
     ConversaoIncompativelError,
     ItemCompra,
+    ItemNaoEncontradoError,
 )
 from apps.conversoes.dominio import ConversaoUnidade
 
@@ -152,3 +153,14 @@ def nao_deve_mexer_em_compra_confirmada(compra):
     with pytest.raises(CompraConfirmadaError):
         compra.confirmar()
     assert compra.total() == Decimal("182.50")
+
+
+# -1 é o caso traiçoeiro: no Python ele apagaria o último item sem avisar ninguém.
+@pytest.mark.parametrize("posicao", [5, -1])
+def nao_deve_aceitar_posicao_que_nao_existe(compra, posicao):
+    compra.adicionar_item(item_em_metro("1", "10"))
+    with pytest.raises(ItemNaoEncontradoError):
+        compra.remover_item(posicao)
+    with pytest.raises(ItemNaoEncontradoError):
+        compra.editar_item(posicao, item_em_metro("1", "10"))
+    assert len(compra.itens) == 1
