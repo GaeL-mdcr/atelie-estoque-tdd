@@ -210,3 +210,11 @@ def deve_publicar_so_producao_concluida(saia):
     assert saia.publicada is True
     saia.retirar_da_vitrine()
     assert saia.publicada is False
+
+
+# Decisão D15: peça reaberta está em andamento de novo, então sai da vitrine sozinha.
+def deve_tirar_da_vitrine_quando_reabrir(saia):
+    saia.concluir(CONCLUSAO)
+    saia.publicar_na_vitrine()
+    saia.reabrir("Cliente pediu ajuste na barra", usuario_id=1, quando=T2)
+    assert saia.publicada is False
